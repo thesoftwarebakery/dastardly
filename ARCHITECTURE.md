@@ -219,6 +219,58 @@ Without changing format-specific parser implementations.
    - Every node has start/end position
    - Line/column tracking built-in
 
+### Incremental Parsing Support
+
+Tree-sitter's incremental parsing is a key performance feature for real-time editing scenarios.
+
+#### Current Status (v1)
+
+The foundation for incremental parsing is in place but **not exposed** in the public API:
+
+- `ParserRuntime.parse()` accepts an optional `oldTree` parameter
+- `SyntaxTree` interface includes an `edit()` method
+- `Edit` and `Point` types define the edit operation structure
+
+These are marked `@internal` and not part of the stable v1 API.
+
+#### Future Support (v2+)
+
+Full incremental parsing will be exposed in a future version:
+
+**API Design (planned):**
+```typescript
+const parser = new JSONParser();
+
+// Initial parse
+const doc1 = parser.parse('{"name": "Alice"}');
+
+// User edits source - provide edit info for incremental parsing
+const edit: Edit = {
+  startIndex: 10,
+  oldEndIndex: 15,
+  newEndIndex: 13,
+  startPosition: { row: 0, column: 10 },
+  oldEndPosition: { row: 0, column: 15 },
+  newEndPosition: { row: 0, column: 13 },
+};
+
+const doc2 = parser.parseIncremental('{"name": "Bob"}', edit);
+```
+
+**Key Design Points:**
+- Tree-sitter reuses unchanged CST nodes internally for performance
+- dASTardly AST remains **immutable** - each parse returns a new AST
+- Performance benefit comes from CST-level optimization, not AST mutation
+- Parser caches the tree-sitter tree between parses
+
+**Why Defer to v2:**
+1. Complexity: Requires tracking source changes and calculating edits
+2. Use case: Most initial users parse complete documents
+3. Testing: Incremental parsing requires sophisticated test scenarios
+4. API surface: Keep v1 focused on core parsing and serialization
+
+The current v1 architecture **does not block** future incremental parsing support.
+
 ### Parser Workflow
 
 ```

@@ -3,6 +3,8 @@
 // Types
 export type {
   TreeSitterPoint,
+  Point,
+  Edit,
   SyntaxNode,
   SyntaxTree,
   Language,

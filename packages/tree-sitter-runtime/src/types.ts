@@ -10,6 +10,27 @@ export interface TreeSitterPoint {
 }
 
 /**
+ * Alias for TreeSitterPoint - used in Edit interface.
+ * @deprecated Use TreeSitterPoint instead
+ */
+export type Point = TreeSitterPoint;
+
+/**
+ * Describes a source code edit for incremental parsing.
+ * Used to update a parse tree before re-parsing.
+ *
+ * @internal - Not part of stable API in v1
+ */
+export interface Edit {
+  readonly startIndex: number;      // Byte offset where edit starts
+  readonly oldEndIndex: number;     // Byte offset where edit ended (before change)
+  readonly newEndIndex: number;     // Byte offset where edit ends (after change)
+  readonly startPosition: TreeSitterPoint;
+  readonly oldEndPosition: TreeSitterPoint;
+  readonly newEndPosition: TreeSitterPoint;
+}
+
+/**
  * Represents a syntax node in the parse tree.
  * This interface abstracts over both tree-sitter and web-tree-sitter node types.
  */
@@ -50,6 +71,14 @@ export interface SyntaxNode {
  */
 export interface SyntaxTree {
   readonly rootNode: SyntaxNode;
+
+  /**
+   * Update the parse tree to reflect a source code edit.
+   * Must be called before re-parsing with this tree as oldTree.
+   *
+   * @internal - Not part of stable API in v1
+   */
+  edit?(edit: Edit): void;
 }
 
 /**
@@ -71,6 +100,12 @@ export interface ParserRuntime {
 
   /**
    * Parse source code into a syntax tree.
+   *
+   * @param source - Source code to parse
+   * @param oldTree - Optional previous parse tree for incremental parsing
+   *                  Tree-sitter will reuse unchanged portions for better performance
+   *
+   * @internal - oldTree parameter is not part of stable API in v1
    */
-  parse(source: string): SyntaxTree;
+  parse(source: string, oldTree?: SyntaxTree): SyntaxTree;
 }
