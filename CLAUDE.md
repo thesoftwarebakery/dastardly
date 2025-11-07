@@ -89,6 +89,13 @@ The core defines:
 - Export all public APIs through `index.ts`
 - Keep AST node definitions in `packages/core/src/ast/`
 
+### Git Commit Standards
+- **Format**: Follow [Conventional Commits](https://www.conventionalcommits.org/)
+- **Types**: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- **Breaking Changes**: Use `!` suffix or `BREAKING CHANGE:` footer
+- **Message Body**: Explain the why, not the what
+- **DO NOT include**: Claude Code footer or co-author attribution in commit messages
+
 ## Development Workflow
 
 ### Building
