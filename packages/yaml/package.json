@@ -23,7 +23,8 @@
   "dependencies": {
     "@dastardly/core": "workspace:^",
     "@dastardly/tree-sitter-runtime": "workspace:^",
-    "tree-sitter": "^0.21.1"
+    "@tree-sitter-grammars/tree-sitter-yaml": "^0.7.1",
+    "tree-sitter": "^0.22.4"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",
