@@ -31,16 +31,10 @@ export interface SourceLocation extends SourceRange {
 }
 
 // =============================================================================
-// AST Node Base Types
+// AST Node Types (Discriminated Union Pattern)
 // =============================================================================
-
-/**
- * Base interface for all AST nodes.
- */
-export interface ASTNode {
-  readonly type: string;
-  readonly loc: SourceLocation;
-}
+// Note: We use type aliases instead of interface inheritance to enable proper
+// discriminated union narrowing. See: https://github.com/microsoft/TypeScript/issues/56106
 
 // =============================================================================
 // Value Nodes (Leaf nodes with scalar values)
@@ -49,36 +43,40 @@ export interface ASTNode {
 /**
  * String value node.
  */
-export interface StringNode extends ASTNode {
+export type StringNode = {
   readonly type: 'String';
   readonly value: string;
   readonly raw?: string;  // Original representation with quotes (e.g., '"hello"')
-}
+  readonly loc: SourceLocation;
+};
 
 /**
  * Number value node.
  */
-export interface NumberNode extends ASTNode {
+export type NumberNode = {
   readonly type: 'Number';
   readonly value: number;
   readonly raw?: string;  // Original representation (e.g., "1.0", "1e5")
-}
+  readonly loc: SourceLocation;
+};
 
 /**
  * Boolean value node.
  */
-export interface BooleanNode extends ASTNode {
+export type BooleanNode = {
   readonly type: 'Boolean';
   readonly value: boolean;
-}
+  readonly loc: SourceLocation;
+};
 
 /**
  * Null value node.
  */
-export interface NullNode extends ASTNode {
+export type NullNode = {
   readonly type: 'Null';
   readonly value: null;
-}
+  readonly loc: SourceLocation;
+};
 
 /**
  * Union of all value node types.
@@ -92,28 +90,31 @@ export type ValueNode = StringNode | NumberNode | BooleanNode | NullNode;
 /**
  * Object property (key-value pair).
  */
-export interface PropertyNode extends ASTNode {
+export type PropertyNode = {
   readonly type: 'Property';
   readonly key: StringNode;
   readonly value: DataNode;
-}
+  readonly loc: SourceLocation;
+};
 
 /**
  * Object node (map/dictionary).
  * No format-specific metadata - keep core pure.
  */
-export interface ObjectNode extends ASTNode {
+export type ObjectNode = {
   readonly type: 'Object';
   readonly properties: readonly PropertyNode[];
-}
+  readonly loc: SourceLocation;
+};
 
 /**
  * Array node (ordered list).
  */
-export interface ArrayNode extends ASTNode {
+export type ArrayNode = {
   readonly type: 'Array';
   readonly elements: readonly DataNode[];
-}
+  readonly loc: SourceLocation;
+};
 
 /**
  * Union of all data node types (containers + values).
@@ -127,7 +128,18 @@ export type DataNode = ObjectNode | ArrayNode | ValueNode;
 /**
  * Document root node.
  */
-export interface DocumentNode extends ASTNode {
+export type DocumentNode = {
   readonly type: 'Document';
   readonly body: DataNode;
-}
+  readonly loc: SourceLocation;
+};
+
+// =============================================================================
+// Base Union Type
+// =============================================================================
+
+/**
+ * Union of all AST node types.
+ * Uses discriminated union pattern for type-safe pattern matching.
+ */
+export type ASTNode = DocumentNode | ObjectNode | ArrayNode | PropertyNode | StringNode | NumberNode | BooleanNode | NullNode;
