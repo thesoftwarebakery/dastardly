@@ -1,0 +1,31 @@
+{
+  "name": "@dastardly/tree-sitter-runtime",
+  "version": "0.1.0",
+  "description": "Tree-sitter runtime abstraction and base parser for dASTardly",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "tree-sitter",
+    "parser",
+    "ast"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@dastardly/core": "workspace:*",
+    "tree-sitter": "^0.21.0"
+  },
+  "devDependencies": {
+    "@vitest/ui": "^4.0.8",
+    "tree-sitter-json": "^0.24.8",
+    "typescript": "^5.3.0",
+    "vitest": "^1.6.1"
+  }
+}
