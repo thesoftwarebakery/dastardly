@@ -6,6 +6,7 @@ import YAML_LANGUAGE from '@tree-sitter-grammars/tree-sitter-yaml';
 
 // Re-export main classes and types
 export { YAMLParser } from './parser.js';
+export { serialize, type SerializeOptions } from './serializer.js';
 
 // Re-export utilities
 export {
