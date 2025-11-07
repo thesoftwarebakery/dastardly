@@ -15,8 +15,7 @@ export class NodeTreeSitterRuntime implements ParserRuntime {
   }
 
   setLanguage(language: Language): void {
-    // tree-sitter Language type is compatible with our Language interface
-    this.parser.setLanguage(language as any);
+    this.parser.setLanguage(language);
   }
 
   parse(source: string): SyntaxTree {
