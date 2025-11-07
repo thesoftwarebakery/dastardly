@@ -100,10 +100,10 @@ describe('Public API', () => {
       }`;
 
       const doc = parse(json);
-      expect(doc.body.type).toBe('Object');
-      if (doc.body.type === 'Object') {
-        expect(doc.body.properties.length).toBeGreaterThan(0);
-      }
+      expect(doc.body).toMatchObject({
+        type: 'Object',
+      });
+      expect(doc.body.properties.length).toBeGreaterThan(0);
     });
 
     it('parses API response-like structure', () => {
