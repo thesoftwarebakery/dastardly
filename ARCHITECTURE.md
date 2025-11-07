@@ -501,6 +501,81 @@ class SerializationError extends Error {
 - Real-time validation
 - Auto-completion based on schema
 
+## Format Package Pattern (Established with JSON)
+
+Each format package follows a consistent pattern. See `IMPLEMENTATION_GUIDE.md` for full details.
+
+### Package Structure
+```
+packages/format-name/
+├── src/
+│   ├── index.ts          # Public API (parse, stringify, etc.)
+│   ├── parser.ts         # FormatParser extends TreeSitterParser
+│   ├── serializer.ts     # serialize() function
+│   └── utils.ts          # Format-specific utilities
+└── __tests__/
+    ├── utils.test.ts
+    ├── parser.test.ts
+    ├── serializer.test.ts
+    └── integration.test.ts
+```
+
+### Implementation Pattern
+
+**Parser Class**:
+- Extends `TreeSitterParser` from `@dastardly/tree-sitter-runtime`
+- Implements `convertDocument(node, source): DocumentNode`
+- Uses tree-sitter CST → dASTardly AST conversion
+- Preserves source positions with `nodeToLocation()`
+- Stores raw values for formatting preservation
+
+**Serializer Function**:
+- Exports `serialize(node, options)` function
+- Supports compact and pretty-print modes
+- Optional `preserveRaw` to maintain original formatting
+- Handles format-specific escaping/encoding
+
+**Public API**:
+- `parse(source): DocumentNode` - Convenience parser
+- `parseValue(source): DataNode` - Returns just body
+- `stringify(node, indent?): string` - Convenience serializer
+- Exports main classes and utilities
+
+### Testing Standards
+- **Utils**: 100% coverage (critical for correctness)
+- **Parser**: 95%+ coverage (all types, errors, positions)
+- **Serializer**: 95%+ coverage (modes, options, edge cases)
+- **Integration**: Roundtrip tests, real-world samples
+- **Target**: 115+ tests per package (JSON has 115)
+
+### JSON Package (Reference Implementation)
+- **Status**: ✅ Complete
+- **Lines of Code**: ~600 production, ~1,500 tests
+- **Test Coverage**: 115 tests, all passing
+- **Implementation Time**: ~15-20 hours
+- **Key Files**:
+  - `packages/json/src/parser.ts` - 205 lines
+  - `packages/json/src/serializer.ts` - 155 lines
+  - `packages/json/src/utils.ts` - 195 lines
+  - `packages/json/__tests__/` - 4 test files
+
+### Remaining Packages
+| Package | Status | Tree-Sitter Grammar | Estimated Effort |
+|---------|--------|---------------------|------------------|
+| YAML    | ⏳ Pending | tree-sitter-yaml | ~20 hours |
+| XML     | ⏳ Pending | tree-sitter-xml | ~25 hours |
+| CSV     | ⏳ Pending | Custom parser | ~15 hours |
+| TOML    | ⏳ Pending | tree-sitter-toml | ~20 hours |
+
+### Format-Specific Considerations
+
+**YAML**: Anchors, aliases, tags, multi-line strings, multiple documents
+**XML**: Attributes, namespaces, CDATA, processing instructions
+**CSV**: Header handling, delimiter options, type inference
+**TOML**: Tables, array of tables, inline tables, datetime types
+
+See `IMPLEMENTATION_GUIDE.md` for detailed instructions on implementing each format.
+
 ## References
 
 - [Tree-sitter Documentation](https://tree-sitter.github.io/tree-sitter/)
@@ -508,3 +583,5 @@ class SerializationError extends Error {
 - [YAML 1.2.2 Spec](https://yaml.org/spec/1.2.2/)
 - [JSON Schema](https://json-schema.org/)
 - [XML 1.0 Spec](https://www.w3.org/TR/xml/)
+- [CSV RFC 4180](https://datatracker.ietf.org/doc/html/rfc4180)
+- [TOML v1.0.0](https://toml.io/en/v1.0.0)
