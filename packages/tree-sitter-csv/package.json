@@ -1,0 +1,82 @@
+{
+  "name": "@dastardly/tree-sitter-csv",
+  "version": "1.2.0",
+  "description": "CSV, PSV, & TSV grammar for tree-sitter (dASTardly fork with prebuilt binaries)",
+  "main": "bindings/node",
+  "files": [
+    "grammar.js",
+    "binding.gyp",
+    "prebuilds/**",
+    "bindings/node/*",
+    "queries/*",
+    "src/**",
+    "csv/src/**",
+    "psv/src/**",
+    "tsv/src/**"
+  ],
+  "keywords": [
+    "parsing",
+    "incremental",
+    "csv",
+    "psv",
+    "tsv"
+  ],
+  "author": "Amaan Qureshi <amaanq12@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "nan": "^2.17.0",
+    "node-gyp-build": "^4.8.2"
+  },
+  "devDependencies": {
+    "eslint": "^8.47.0",
+    "eslint-config-google": "^0.14.0",
+    "prebuildify": "^6.0.1",
+    "tree-sitter-cli": "^0.20.8"
+  },
+  "scripts": {
+    "build": "npm run build-csv && npm run build-psv && npm run build-tsv",
+    "build-csv": "cd csv && npx tree-sitter generate --no-bindings",
+    "build-psv": "cd psv && npx tree-sitter generate --no-bindings",
+    "build-tsv": "cd tsv && npx tree-sitter generate --no-bindings",
+    "install": "node-gyp-build",
+    "prebuildify": "prebuildify --napi --strip",
+    "lint": "eslint common/define-grammar.js csv/grammar.js tsv/grammar.js",
+    "test-load": "node -e \"console.log(require('./bindings/node').csv.name, require('./bindings/node').psv.name, require('./bindings/node').tsv.name)\"",
+    "test": "npm run test-load"
+  },
+  "tree-sitter": [
+    {
+      "scope": "source.csv",
+      "file-types": [
+        "csv"
+      ],
+      "path": "csv",
+      "highlights": [
+        "queries/highlights.scm"
+      ],
+      "injection-regex": "csv"
+    },
+    {
+      "scope": "source.psv",
+      "file-types": [
+        "psv"
+      ],
+      "path": "psv",
+      "highlights": [
+        "queries/highlights.scm"
+      ],
+      "injection-regex": "psv"
+    },
+    {
+      "scope": "source.tsv",
+      "file-types": [
+        "tsv"
+      ],
+      "path": "tsv",
+      "highlights": [
+        "queries/highlights.scm"
+      ],
+      "injection-regex": "tsv"
+    }
+  ]
+}
