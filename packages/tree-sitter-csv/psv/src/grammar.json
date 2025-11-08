@@ -106,11 +106,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "text"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "number"
+          "name": "boolean"
         },
         {
           "type": "SYMBOL",
@@ -118,7 +114,11 @@
         },
         {
           "type": "SYMBOL",
-          "name": "boolean"
+          "name": "number"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "text"
         },
         {
           "type": "SYMBOL",
@@ -133,7 +133,7 @@
         "members": [
           {
             "type": "PATTERN",
-            "value": "[^|\\d\\s\"][^|\\s\"]*"
+            "value": "[^|\\s\",][^|\\s\"]*"
           },
           {
             "type": "SEQ",

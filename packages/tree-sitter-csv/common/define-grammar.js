@@ -40,10 +40,14 @@ module.exports = function defineGrammar(dialect, separator) {
         repeat(seq(separator, $.field)),
         optional(separator),
       ),
-      field: $ => choice($.text, $.number, $.float, $.boolean, $.empty_field),
+      // Try boolean/number/float first (more specific), then text (catch-all), then empty_field
+      field: $ => choice($.boolean, $.float, $.number, $.text, $.empty_field),
 
       text: _ => token(choice(
-        new RegExp(`[^${separator}\\d\\s"][^${separator}\\s"]*`),
+        // Unquoted text: anything except separator, whitespace, or quotes
+        // Can include hyphens, digits mixed with non-digits (e.g., "2024-01-01")
+        new RegExp(`[^${separator}\\s",][^${separator}\\s"]*`),
+        // Quoted text: anything inside quotes, with "" for escaped quotes
         seq('"', repeat(choice(/[^"]/, '""')), '"'),
       )),
       number: _ => choice(/\d+/, /0[xX][0-9a-fA-F]+/),
