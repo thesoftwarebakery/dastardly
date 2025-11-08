@@ -11,6 +11,7 @@
         "csv/src/parser.c",
         "psv/src/parser.c",
         "tsv/src/parser.c",
+        "src/scanner.c",
       ],
       "cflags_c": [
         "-std=c99",
