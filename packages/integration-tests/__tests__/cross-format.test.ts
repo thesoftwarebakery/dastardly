@@ -481,7 +481,7 @@ describe('Cross-format conversions: CSV ↔ JSON', () => {
       ]);
       const jsonAst = parseJSON(jsonSource);
       const csvOutput = serializeCSV(jsonAst);
-      const csvAst = parseCSV(csvOutput);
+      const csvAst = parseCSV(csvOutput, { inferTypes: true });
 
       expect(toNative(jsonAst)).toEqual(toNative(csvAst));
     });
@@ -678,7 +678,7 @@ describe('Cross-format conversions: CSV ↔ YAML', () => {
 `;
       const yamlAst = parseYAML(yamlSource);
       const csvOutput = serializeCSV(yamlAst);
-      const csvAst = parseCSV(csvOutput);
+      const csvAst = parseCSV(csvOutput, { inferTypes: true });
 
       expect(toNative(yamlAst)).toEqual(toNative(csvAst));
     });

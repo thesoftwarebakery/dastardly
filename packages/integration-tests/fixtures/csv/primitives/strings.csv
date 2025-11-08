@@ -1,4 +1,4 @@
 short,long,single
-a,hello world,x
-b,the quick brown fox,y
-c,jumps over the lazy dog,z
+Hi,"Hello World",A
+Bye,"Goodbye World",B
+Test,"The Quick Brown Fox",C
