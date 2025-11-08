@@ -280,6 +280,10 @@ export class CSVParser extends TreeSitterParser {
         const value = child.text === 'true';
         return inferTypes ? booleanNode(value, location) : child.text;
       }
+      case 'empty_field': {
+        // Empty field detected by external scanner
+        return inferTypes ? stringNode('', location) : '';
+      }
       default:
         return child.text;
     }
