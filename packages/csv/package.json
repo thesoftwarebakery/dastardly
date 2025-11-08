@@ -1,0 +1,37 @@
+{
+  "name": "@dastardly/csv",
+  "version": "0.1.0",
+  "description": "CSV parser and serializer for dASTardly",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "keywords": [
+    "csv",
+    "tsv",
+    "psv",
+    "parser",
+    "serializer",
+    "ast",
+    "tree-sitter"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@dastardly/core": "workspace:^",
+    "@dastardly/tree-sitter-csv": "workspace:^",
+    "@dastardly/tree-sitter-runtime": "workspace:^",
+    "tree-sitter": "^0.21.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.0",
+    "@vitest/ui": "^1.6.1",
+    "typescript": "^5.3.0",
+    "vitest": "^1.6.1"
+  }
+}
