@@ -1,0 +1,8 @@
+id,description,notes
+1,"Simple quoted field","Normal text"
+2,"Field with, comma","Contains comma"
+3,"Field with ""quotes""","Escaped quotes"
+4,"Field with
+newline","Contains newline"
+5,"Mixed: comma, ""quotes"", and
+newline","All special cases"

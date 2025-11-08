@@ -1,0 +1,4 @@
+string,number,boolean,float
+hello,42,true,3.14
+world,100,false,2.718
+test,0,true,1.0

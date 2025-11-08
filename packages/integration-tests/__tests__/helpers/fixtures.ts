@@ -37,6 +37,16 @@ export function loadYAMLFixture(name: string): string {
 }
 
 /**
+ * Load a CSV fixture by name
+ * @param name - Name with optional category prefix (e.g., 'primitives/simple' or 'employee-data')
+ */
+export function loadCSVFixture(name: string): string {
+  const path = name.includes('/') ? name : `${name}.csv`;
+  const fullPath = path.endsWith('.csv') ? path : `${path}.csv`;
+  return loadFixture(`csv/${fullPath}`);
+}
+
+/**
  * Load an expected output fixture
  * @param category - One of: 'json-to-yaml', 'yaml-to-json', 'roundtrip'
  * @param name - Fixture name

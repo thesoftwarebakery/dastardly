@@ -1,0 +1,6 @@
+id,name,email,phone
+1,Alice,alice@example.com,555-0001
+2,,bob@example.com,
+3,Carol,,555-0003
+,,charlie@example.com,555-0004
+5,,,

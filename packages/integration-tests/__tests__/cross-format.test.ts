@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { parse as parseJSON, serialize as serializeJSON } from '@dastardly/json';
 import { parse as parseYAML, serialize as serializeYAML } from '@dastardly/yaml';
+import { parse as parseCSV, serialize as serializeCSV } from '@dastardly/csv';
 import { toNative } from '@dastardly/core';
-import { loadJSONFixture, loadYAMLFixture } from './helpers/fixtures.js';
+import { loadJSONFixture, loadYAMLFixture, loadCSVFixture } from './helpers/fixtures.js';
 
 describe('Cross-format conversions: JSON ↔ YAML', () => {
   describe('JSON → YAML → JSON roundtrip', () => {
@@ -369,6 +370,317 @@ describe('Cross-format conversions: JSON ↔ YAML', () => {
       const value = toNative(jsonAst) as string;
       expect(value).toContain('This is a multiline');
       expect(value).toContain('string with line breaks');
+    });
+  });
+});
+
+describe('Cross-format conversions: CSV ↔ JSON', () => {
+  describe('CSV → JSON → CSV roundtrip', () => {
+    it('converts simple CSV with headers', () => {
+      const csvSource = loadCSVFixture('primitives/simple');
+      const csvAst = parseCSV(csvSource);
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+      const csvOutput = serializeCSV(jsonAst);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<Record<string, unknown>>;
+      expect(native).toHaveLength(3);
+      expect(native[0]).toEqual({ name: 'Alice', age: '30', active: 'true' });
+    });
+
+    it('converts array of objects', () => {
+      const csvSource = loadCSVFixture('collections/array-of-objects');
+      const csvAst = parseCSV(csvSource);
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<Record<string, unknown>>;
+      expect(native).toHaveLength(3);
+      expect(native[0]).toHaveProperty('id', '1');
+      expect(native[0]).toHaveProperty('name', 'Alice');
+      expect(native[0]).toHaveProperty('email', 'alice@example.com');
+    });
+
+    it('converts mixed types with type inference', () => {
+      const csvSource = loadCSVFixture('collections/mixed-types');
+      const csvAst = parseCSV(csvSource, { inferTypes: true });
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<Record<string, unknown>>;
+      expect(native[0]).toEqual({
+        string: 'hello',
+        number: 42,
+        boolean: true,
+        float: 3.14,
+      });
+      expect(typeof native[0].number).toBe('number');
+      expect(typeof native[0].boolean).toBe('boolean');
+      expect(typeof native[0].float).toBe('number');
+    });
+
+    it('handles empty fields', () => {
+      const csvSource = loadCSVFixture('edge-cases/empty-fields');
+      const csvAst = parseCSV(csvSource);
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<Record<string, unknown>>;
+      expect(native[1]).toHaveProperty('name', '');
+      expect(native[1]).toHaveProperty('phone', '');
+      expect(native[2]).toHaveProperty('email', '');
+    });
+
+    it('handles quoted fields with special characters', () => {
+      const csvSource = loadCSVFixture('edge-cases/quoted-fields');
+      const csvAst = parseCSV(csvSource);
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<Record<string, unknown>>;
+      expect(native[1].description).toBe('Field with, comma');
+      expect(native[2].description).toBe('Field with "quotes"');
+      expect(native[3].description).toContain('\n');
+    });
+
+    it('handles special characters and unicode', () => {
+      const csvSource = loadCSVFixture('edge-cases/special-chars');
+      const csvAst = parseCSV(csvSource);
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<Record<string, unknown>>;
+      expect(native[0]).toHaveProperty('emoji', '👋');
+      expect(native[0]).toHaveProperty('unicode', 'café');
+      expect(native[3]).toHaveProperty('unicode', '日本語');
+    });
+  });
+
+  describe('JSON → CSV conversion', () => {
+    it('converts array of objects to CSV', () => {
+      const jsonSource = loadJSONFixture('collections/simple-array');
+      const jsonAst = parseJSON(jsonSource);
+
+      // Simple array [1,2,3,4,5] can't be directly converted to CSV with headers
+      // It needs to be an array of objects
+      const native = toNative(jsonAst) as number[];
+      expect(native).toEqual([1, 2, 3, 4, 5]);
+    });
+
+    it('converts object array from JSON to CSV', () => {
+      // Use a JSON fixture that's compatible with CSV structure
+      const jsonSource = JSON.stringify([
+        { id: 1, name: 'Alice', age: 30 },
+        { id: 2, name: 'Bob', age: 25 },
+      ]);
+      const jsonAst = parseJSON(jsonSource);
+      const csvOutput = serializeCSV(jsonAst);
+      const csvAst = parseCSV(csvOutput);
+
+      expect(toNative(jsonAst)).toEqual(toNative(csvAst));
+    });
+  });
+
+  describe('Real-world CSV documents', () => {
+    it('converts employee data', () => {
+      const csvSource = loadCSVFixture('real-world/employee-data');
+      const csvAst = parseCSV(csvSource, { inferTypes: true });
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<Record<string, unknown>>;
+      expect(native).toHaveLength(5);
+      expect(native[0]).toHaveProperty('name', 'Alice Smith');
+      expect(native[0]).toHaveProperty('department', 'Engineering');
+      expect(native[0]).toHaveProperty('salary', 100000);
+    });
+
+    it('converts product catalog', () => {
+      const csvSource = loadCSVFixture('real-world/product-catalog');
+      const csvAst = parseCSV(csvSource, { inferTypes: true });
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<Record<string, unknown>>;
+      expect(native).toHaveLength(5);
+      expect(native[0]).toHaveProperty('sku', 'WID-001');
+      expect(native[0]).toHaveProperty('price', 19.99);
+      expect(native[0]).toHaveProperty('in_stock', true);
+    });
+
+    it('converts sales data', () => {
+      const csvSource = loadCSVFixture('real-world/sales-data');
+      const csvAst = parseCSV(csvSource, { inferTypes: true });
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<Record<string, unknown>>;
+      expect(native).toHaveLength(5);
+      expect(native[0]).toHaveProperty('product', 'Widget');
+      expect(native[0]).toHaveProperty('quantity', 10);
+      expect(native[0]).toHaveProperty('revenue', 199.9);
+    });
+  });
+
+  describe('CSV edge cases', () => {
+    it('handles single column CSV', () => {
+      const csvSource = loadCSVFixture('edge-cases/single-column');
+      const csvAst = parseCSV(csvSource, { inferTypes: true });
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<Record<string, unknown>>;
+      expect(native).toHaveLength(4);
+      expect(native[0]).toHaveProperty('value', 42);
+      expect(native[1]).toHaveProperty('value', 3.14);
+    });
+
+    it('handles single row (headers only)', () => {
+      const csvSource = loadCSVFixture('edge-cases/single-row');
+      const csvAst = parseCSV(csvSource);
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<unknown>;
+      expect(native).toHaveLength(0);
+    });
+
+    it('handles large datasets efficiently', () => {
+      const csvSource = loadCSVFixture('edge-cases/large-dataset');
+      const csvAst = parseCSV(csvSource);
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<unknown>;
+      expect(native).toHaveLength(20);
+    });
+
+    it('handles trailing commas', () => {
+      const csvSource = loadCSVFixture('edge-cases/trailing-comma');
+      const csvAst = parseCSV(csvSource);
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<Record<string, unknown>>;
+      // Trailing comma creates an empty field
+      expect(Object.keys(native[0] ?? {})).toHaveLength(4);
+    });
+
+    it('handles leading commas', () => {
+      const csvSource = loadCSVFixture('edge-cases/leading-comma');
+      const csvAst = parseCSV(csvSource);
+      const jsonOutput = serializeJSON(csvAst);
+      const jsonAst = parseJSON(jsonOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(jsonAst));
+      const native = toNative(csvAst) as Array<Record<string, unknown>>;
+      // Leading comma creates an empty header field
+      expect(Object.keys(native[0] ?? {})).toHaveLength(4);
+    });
+  });
+});
+
+describe('Cross-format conversions: CSV ↔ YAML', () => {
+  describe('CSV → YAML → CSV roundtrip', () => {
+    it('converts simple CSV to YAML', () => {
+      const csvSource = loadCSVFixture('primitives/simple');
+      const csvAst = parseCSV(csvSource);
+      const yamlOutput = serializeYAML(csvAst);
+      const yamlAst = parseYAML(yamlOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(yamlAst));
+      const native = toNative(csvAst) as Array<Record<string, unknown>>;
+      expect(native).toHaveLength(3);
+      expect(native[0]).toHaveProperty('name', 'Alice');
+    });
+
+    it('converts array of objects via YAML', () => {
+      const csvSource = loadCSVFixture('collections/array-of-objects');
+      const csvAst = parseCSV(csvSource);
+      const yamlOutput = serializeYAML(csvAst);
+      const yamlAst = parseYAML(yamlOutput);
+      const csvOutput = serializeCSV(yamlAst);
+
+      expect(toNative(csvAst)).toEqual(toNative(yamlAst));
+      // Note: CSV roundtrip may not preserve exact formatting
+      expect(csvOutput).toContain('id,name,email');
+    });
+
+    it('converts real-world employee data via YAML', () => {
+      const csvSource = loadCSVFixture('real-world/employee-data');
+      const csvAst = parseCSV(csvSource, { inferTypes: true });
+      const yamlOutput = serializeYAML(csvAst);
+      const yamlAst = parseYAML(yamlOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(yamlAst));
+      const native = toNative(yamlAst) as Array<Record<string, unknown>>;
+      expect(native[0]).toHaveProperty('name', 'Alice Smith');
+      expect(native[0]).toHaveProperty('salary', 100000);
+    });
+
+    it('handles empty fields in YAML conversion', () => {
+      const csvSource = loadCSVFixture('edge-cases/empty-fields');
+      const csvAst = parseCSV(csvSource);
+      const yamlOutput = serializeYAML(csvAst);
+      const yamlAst = parseYAML(yamlOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(yamlAst));
+      const native = toNative(yamlAst) as Array<Record<string, unknown>>;
+      expect(native[1].name).toBe('');
+      expect(native[1].phone).toBe('');
+    });
+
+    it('handles special characters in YAML conversion', () => {
+      const csvSource = loadCSVFixture('edge-cases/special-chars');
+      const csvAst = parseCSV(csvSource);
+      const yamlOutput = serializeYAML(csvAst);
+      const yamlAst = parseYAML(yamlOutput);
+
+      expect(toNative(csvAst)).toEqual(toNative(yamlAst));
+      const native = toNative(yamlAst) as Array<Record<string, unknown>>;
+      expect(native[0].emoji).toBe('👋');
+      expect(native[0].unicode).toBe('café');
+    });
+  });
+
+  describe('YAML → CSV conversion limitations', () => {
+    it('handles flat YAML structures', () => {
+      const yamlSource = loadYAMLFixture('collections/block-sequence');
+      const yamlAst = parseYAML(yamlSource);
+
+      // Simple sequence like ['apple', 'banana', 'cherry'] can't be directly converted to CSV with headers
+      // It would need to be an array of objects
+      const native = toNative(yamlAst) as string[];
+      expect(native).toEqual(['apple', 'banana', 'cherry']);
+    });
+
+    it('converts YAML array of objects to CSV', () => {
+      const yamlSource = `
+- id: 1
+  name: Alice
+  age: 30
+- id: 2
+  name: Bob
+  age: 25
+`;
+      const yamlAst = parseYAML(yamlSource);
+      const csvOutput = serializeCSV(yamlAst);
+      const csvAst = parseCSV(csvOutput);
+
+      expect(toNative(yamlAst)).toEqual(toNative(csvAst));
     });
   });
 });

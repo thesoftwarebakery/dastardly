@@ -1,9 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { parse as parseJSON, serialize as serializeJSON } from '@dastardly/json';
 import { parse as parseYAML, serialize as serializeYAML } from '@dastardly/yaml';
+import { parse as parseCSV, serialize as serializeCSV } from '@dastardly/csv';
 import { toNative } from '@dastardly/core';
 import { assertRoundtripEqual } from './helpers/assertions.js';
-import { loadJSONFixture, loadYAMLFixture } from './helpers/fixtures.js';
+import { loadJSONFixture, loadYAMLFixture, loadCSVFixture } from './helpers/fixtures.js';
 
 describe('Roundtrip tests', () => {
   describe('JSON roundtrip: parse → stringify → parse', () => {
@@ -507,6 +508,316 @@ describe('Roundtrip tests', () => {
 
       // Data should be unchanged
       expect(toNative(ast)).toEqual(originalNative);
+    });
+  });
+
+  describe('CSV roundtrip: parse → serialize → parse', () => {
+    it('roundtrips simple CSV with headers', () => {
+      const source = loadCSVFixture('primitives/simple');
+      const ast1 = parseCSV(source);
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output);
+
+      assertRoundtripEqual(ast1, ast2);
+      expect(toNative(ast2)).toEqual(toNative(ast1));
+    });
+
+    it('roundtrips numbers CSV', () => {
+      const source = loadCSVFixture('primitives/numbers');
+      const ast1 = parseCSV(source, { inferTypes: true });
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output, { inferTypes: true });
+
+      assertRoundtripEqual(ast1, ast2);
+      const native = toNative(ast2) as Array<Record<string, unknown>>;
+      expect(native[0]).toHaveProperty('integer', 42);
+      expect(native[0]).toHaveProperty('float', 3.14);
+    });
+
+    it('roundtrips strings CSV', () => {
+      const source = loadCSVFixture('primitives/strings');
+      const ast1 = parseCSV(source);
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output);
+
+      assertRoundtripEqual(ast1, ast2);
+      const native = toNative(ast2) as Array<Record<string, unknown>>;
+      expect(native[0]).toHaveProperty('short', 'Hi');
+      expect(native[0]).toHaveProperty('single', 'A');
+    });
+
+    it('roundtrips array of objects', () => {
+      const source = loadCSVFixture('collections/array-of-objects');
+      const ast1 = parseCSV(source);
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output);
+
+      assertRoundtripEqual(ast1, ast2);
+      expect(toNative(ast2)).toEqual([
+        { id: '1', name: 'Alice', email: 'alice@example.com' },
+        { id: '2', name: 'Bob', email: 'bob@example.com' },
+        { id: '3', name: 'Carol', email: 'carol@example.com' },
+      ]);
+    });
+
+    it('roundtrips mixed types', () => {
+      const source = loadCSVFixture('collections/mixed-types');
+      const ast1 = parseCSV(source, { inferTypes: true });
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output, { inferTypes: true });
+
+      assertRoundtripEqual(ast1, ast2);
+      const native = toNative(ast2) as Array<Record<string, unknown>>;
+      expect(native[0]).toEqual({
+        string: 'hello',
+        number: 42,
+        boolean: true,
+        float: 3.14,
+      });
+    });
+
+    it('roundtrips empty fields', () => {
+      const source = loadCSVFixture('edge-cases/empty-fields');
+      const ast1 = parseCSV(source);
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output);
+
+      assertRoundtripEqual(ast1, ast2);
+      const native = toNative(ast2) as Array<Record<string, unknown>>;
+      expect(native[1]).toHaveProperty('name', '');
+      expect(native[1]).toHaveProperty('phone', '');
+    });
+
+    it('roundtrips quoted fields', () => {
+      const source = loadCSVFixture('edge-cases/quoted-fields');
+      const ast1 = parseCSV(source);
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output);
+
+      assertRoundtripEqual(ast1, ast2);
+      const native = toNative(ast2) as Array<Record<string, unknown>>;
+      expect(native[1].description).toBe('Field with, comma');
+      expect(native[2].description).toBe('Field with "quotes"');
+      expect(native[3].description).toContain('\n');
+    });
+
+    it('roundtrips special characters', () => {
+      const source = loadCSVFixture('edge-cases/special-chars');
+      const ast1 = parseCSV(source);
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output);
+
+      assertRoundtripEqual(ast1, ast2);
+      const native = toNative(ast2) as Array<Record<string, unknown>>;
+      expect(native[0]).toHaveProperty('emoji', '👋');
+      expect(native[0]).toHaveProperty('unicode', 'café');
+      expect(native[3]).toHaveProperty('unicode', '日本語');
+    });
+
+    it('roundtrips single column CSV', () => {
+      const source = loadCSVFixture('edge-cases/single-column');
+      const ast1 = parseCSV(source, { inferTypes: true });
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output, { inferTypes: true });
+
+      assertRoundtripEqual(ast1, ast2);
+      const native = toNative(ast2) as Array<Record<string, unknown>>;
+      expect(native).toHaveLength(4);
+      expect(native[0]).toHaveProperty('value', 42);
+    });
+
+    it('roundtrips single row (headers only)', () => {
+      const source = loadCSVFixture('edge-cases/single-row');
+      const ast1 = parseCSV(source);
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output);
+
+      assertRoundtripEqual(ast1, ast2);
+      expect(toNative(ast2)).toEqual([]);
+    });
+
+    it('roundtrips large datasets', () => {
+      const source = loadCSVFixture('edge-cases/large-dataset');
+      const ast1 = parseCSV(source);
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output);
+
+      assertRoundtripEqual(ast1, ast2);
+      const native = toNative(ast2) as Array<unknown>;
+      expect(native).toHaveLength(20);
+    });
+
+    it('roundtrips real-world employee data', () => {
+      const source = loadCSVFixture('real-world/employee-data');
+      const ast1 = parseCSV(source, { inferTypes: true });
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output, { inferTypes: true });
+
+      assertRoundtripEqual(ast1, ast2);
+      const native = toNative(ast2) as Array<Record<string, unknown>>;
+      expect(native).toHaveLength(5);
+      expect(native[0]).toHaveProperty('name', 'Alice Smith');
+      expect(native[0]).toHaveProperty('salary', 100000);
+    });
+
+    it('roundtrips real-world product catalog', () => {
+      const source = loadCSVFixture('real-world/product-catalog');
+      const ast1 = parseCSV(source, { inferTypes: true });
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output, { inferTypes: true });
+
+      assertRoundtripEqual(ast1, ast2);
+      const native = toNative(ast2) as Array<Record<string, unknown>>;
+      expect(native).toHaveLength(5);
+      expect(native[0]).toHaveProperty('sku', 'WID-001');
+      expect(native[0]).toHaveProperty('price', 19.99);
+    });
+
+    it('roundtrips real-world sales data', () => {
+      const source = loadCSVFixture('real-world/sales-data');
+      const ast1 = parseCSV(source, { inferTypes: true });
+      const output = serializeCSV(ast1);
+      const ast2 = parseCSV(output, { inferTypes: true });
+
+      assertRoundtripEqual(ast1, ast2);
+      const native = toNative(ast2) as Array<Record<string, unknown>>;
+      expect(native).toHaveLength(5);
+      expect(native[0]).toHaveProperty('product', 'Widget');
+      expect(native[0]).toHaveProperty('quantity', 10);
+    });
+  });
+
+  describe('CSV formatting options', () => {
+    it('handles different delimiters (TSV)', () => {
+      const source = loadCSVFixture('primitives/simple');
+      const ast = parseCSV(source);
+      const output = serializeCSV(ast, { delimiter: '\t' });
+
+      expect(output).toContain('\t');
+      expect(output).not.toContain(',');
+
+      // Verify roundtrip with TSV
+      const ast2 = parseCSV(output, { delimiter: '\t' });
+      assertRoundtripEqual(ast, ast2);
+    });
+
+    it('handles different delimiters (PSV)', () => {
+      const source = loadCSVFixture('primitives/simple');
+      const ast = parseCSV(source);
+      const output = serializeCSV(ast, { delimiter: '|' });
+
+      expect(output).toContain('|');
+      expect(output).not.toContain(',');
+
+      // Verify roundtrip with PSV
+      const ast2 = parseCSV(output, { delimiter: '|' });
+      assertRoundtripEqual(ast, ast2);
+    });
+
+    it('handles different quote strategies', () => {
+      const source = loadCSVFixture('primitives/simple');
+      const ast = parseCSV(source);
+
+      // Quote all fields
+      const allQuoted = serializeCSV(ast, { quoteStrategy: 'all' });
+      expect(allQuoted.split('\n')[0]).toBe('"name","age","active"');
+
+      // Quote only when needed
+      const needed = serializeCSV(ast, { quoteStrategy: 'needed' });
+      expect(needed.split('\n')[0]).toBe('name,age,active');
+    });
+
+    it('handles different line endings', () => {
+      const source = loadCSVFixture('primitives/simple');
+      const ast = parseCSV(source);
+
+      // LF (Unix)
+      const lf = serializeCSV(ast, { lineEnding: 'LF' });
+      expect(lf).toContain('\n');
+      expect(lf).not.toContain('\r\n');
+
+      // CRLF (Windows)
+      const crlf = serializeCSV(ast, { lineEnding: 'CRLF' });
+      expect(crlf).toContain('\r\n');
+    });
+
+    it('handles includeHeaders option', () => {
+      const source = loadCSVFixture('primitives/simple');
+      const ast = parseCSV(source);
+
+      // Without headers
+      const noHeaders = serializeCSV(ast, { includeHeaders: false });
+      expect(noHeaders).not.toContain('name,age,active');
+      expect(noHeaders).toContain('Alice');
+
+      // With headers (default)
+      const withHeaders = serializeCSV(ast);
+      expect(withHeaders).toContain('name,age,active');
+    });
+  });
+
+  describe('CSV cross-format roundtrip stability', () => {
+    it('CSV → JSON → CSV → JSON is stable', () => {
+      const csvSource = loadCSVFixture('collections/array-of-objects');
+      const csv1 = parseCSV(csvSource);
+      const json1 = serializeJSON(csv1);
+      const jsonAst = parseJSON(json1);
+      const csv2 = serializeCSV(jsonAst);
+      const csvAst = parseCSV(csv2);
+      const json2 = serializeJSON(csvAst);
+
+      // Second JSON output should match first JSON output
+      expect(json1).toBe(json2);
+    });
+
+    it('CSV → YAML → CSV → YAML is stable', () => {
+      const csvSource = loadCSVFixture('collections/array-of-objects');
+      const csv1 = parseCSV(csvSource);
+      const yaml1 = serializeYAML(csv1);
+      const yamlAst = parseYAML(yaml1);
+      const csv2 = serializeCSV(yamlAst);
+      const csvAst = parseCSV(csv2);
+      const yaml2 = serializeYAML(csvAst);
+
+      // Second YAML output should match first YAML output
+      expect(yaml1).toBe(yaml2);
+    });
+
+    it('multiple CSV roundtrips preserve data integrity', () => {
+      const source = loadCSVFixture('real-world/employee-data');
+      let ast = parseCSV(source, { inferTypes: true });
+      const originalNative = toNative(ast);
+
+      // Do 5 roundtrips
+      for (let i = 0; i < 5; i++) {
+        const csv = serializeCSV(ast);
+        ast = parseCSV(csv, { inferTypes: true });
+      }
+
+      // Data should be unchanged
+      expect(toNative(ast)).toEqual(originalNative);
+    });
+
+    it('CSV with empty fields roundtrips through JSON', () => {
+      const csvSource = loadCSVFixture('edge-cases/empty-fields');
+      const csv1 = parseCSV(csvSource);
+      const json = serializeJSON(csv1);
+      const jsonAst = parseJSON(json);
+      const csv2 = serializeCSV(jsonAst);
+      const csvAst = parseCSV(csv2);
+
+      expect(toNative(csv1)).toEqual(toNative(csvAst));
+    });
+
+    it('CSV with special characters roundtrips through YAML', () => {
+      const csvSource = loadCSVFixture('edge-cases/special-chars');
+      const csv1 = parseCSV(csvSource);
+      const yaml = serializeYAML(csv1);
+      const yamlAst = parseYAML(yaml);
+      const csv2 = serializeCSV(yamlAst);
+      const csvAst = parseCSV(csv2);
+
+      expect(toNative(csv1)).toEqual(toNative(csvAst));
     });
   });
 });

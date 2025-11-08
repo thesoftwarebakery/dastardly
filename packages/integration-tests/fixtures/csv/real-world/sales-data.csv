@@ -1,0 +1,6 @@
+date,product,quantity,revenue,region
+2024-01-01,Widget,10,199.90,North
+2024-01-02,Gadget,5,149.95,South
+2024-01-03,Widget,15,299.85,East
+2024-01-04,Thingamajig,3,135.00,West
+2024-01-05,Doohickey,20,310.00,North

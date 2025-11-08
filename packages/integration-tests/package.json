@@ -17,6 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "@dastardly/core": "workspace:^",
+    "@dastardly/csv": "workspace:^",
     "@dastardly/json": "workspace:^",
     "@dastardly/yaml": "workspace:^",
     "@dastardly/tree-sitter-runtime": "workspace:^"

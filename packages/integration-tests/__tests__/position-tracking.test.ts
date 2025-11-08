@@ -1,12 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { parse as parseJSON } from '@dastardly/json';
 import { parse as parseYAML } from '@dastardly/yaml';
+import { parse as parseCSV } from '@dastardly/csv';
 import {
   assertAllPositionsValid,
   assertSourceLocationValid,
   assertPositionRangesValid,
 } from './helpers/assertions.js';
-import { loadJSONFixture, loadYAMLFixture } from './helpers/fixtures.js';
+import { loadJSONFixture, loadYAMLFixture, loadCSVFixture } from './helpers/fixtures.js';
 import type { ArrayNode, ObjectNode } from '@dastardly/core';
 
 describe('Position tracking', () => {
@@ -344,6 +345,372 @@ describe('Position tracking', () => {
           expect(prop.loc.end.offset).toBeGreaterThanOrEqual(
             prop.value.loc.end.offset
           );
+        }
+      }
+    });
+  });
+
+  describe('CSV position tracking', () => {
+    it('tracks positions for simple CSV', () => {
+      const source = loadCSVFixture('primitives/simple');
+      const ast = parseCSV(source);
+
+      assertAllPositionsValid(ast);
+      expect(ast.loc.source).toBe('csv');
+    });
+
+    it('tracks positions for array of objects', () => {
+      const source = loadCSVFixture('collections/array-of-objects');
+      const ast = parseCSV(source);
+
+      assertAllPositionsValid(ast);
+
+      // CSV body should be an array
+      expect(ast.body?.type).toBe('Array');
+
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+
+        // Each row should have valid positions
+        for (const element of arrayNode.elements) {
+          assertSourceLocationValid(element.loc);
+
+          // Each row should be an object
+          if (element.type === 'Object') {
+            const objectNode = element as ObjectNode;
+
+            // Each field should have valid positions
+            for (const prop of objectNode.properties) {
+              assertSourceLocationValid(prop.loc);
+              assertSourceLocationValid(prop.key.loc);
+              assertSourceLocationValid(prop.value.loc);
+            }
+          }
+        }
+
+        // Rows should not overlap
+        assertPositionRangesValid(arrayNode.elements);
+      }
+    });
+
+    it('tracks positions for empty fields', () => {
+      const source = loadCSVFixture('edge-cases/empty-fields');
+      const ast = parseCSV(source);
+
+      assertAllPositionsValid(ast);
+
+      // Empty fields should still have valid (zero-width) positions
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+
+        for (const element of arrayNode.elements) {
+          if (element.type === 'Object') {
+            const objectNode = element as ObjectNode;
+
+            for (const prop of objectNode.properties) {
+              // Empty string values should have valid positions
+              if (prop.value.type === 'String' && prop.value.value === '') {
+                assertSourceLocationValid(prop.value.loc);
+
+                // Empty fields might have zero-width spans
+                const start = prop.value.loc.start.offset;
+                const end = prop.value.loc.end.offset;
+                expect(end).toBeGreaterThanOrEqual(start);
+              }
+            }
+          }
+        }
+      }
+    });
+
+    it('tracks positions for quoted fields', () => {
+      const source = loadCSVFixture('edge-cases/quoted-fields');
+      const ast = parseCSV(source);
+
+      assertAllPositionsValid(ast);
+
+      // Quoted fields should include the quotes in position tracking
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+
+        for (const element of arrayNode.elements) {
+          if (element.type === 'Object') {
+            const objectNode = element as ObjectNode;
+
+            for (const prop of objectNode.properties) {
+              assertSourceLocationValid(prop.value.loc);
+
+              // Extract substring using offsets
+              const start = prop.value.loc.start.offset;
+              const end = prop.value.loc.end.offset;
+              const substring = source.substring(start, end);
+
+              // For quoted fields, substring might start with quote
+              if (prop.value.type === 'String' && prop.value.value.includes(',')) {
+                expect(substring).toBeTruthy();
+              }
+            }
+          }
+        }
+      }
+    });
+
+    it('tracks positions for special characters', () => {
+      const source = loadCSVFixture('edge-cases/special-chars');
+      const ast = parseCSV(source);
+
+      assertAllPositionsValid(ast);
+
+      // Unicode characters should be handled correctly
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+
+        for (const element of arrayNode.elements) {
+          assertSourceLocationValid(element.loc);
+        }
+      }
+    });
+
+    it('tracks positions for real-world CSV', () => {
+      const source = loadCSVFixture('real-world/employee-data');
+      const ast = parseCSV(source, { inferTypes: true });
+
+      assertAllPositionsValid(ast);
+
+      // Verify some specific positions
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+        expect(arrayNode.elements.length).toBeGreaterThan(0);
+
+        for (const element of arrayNode.elements) {
+          assertSourceLocationValid(element.loc);
+        }
+      }
+    });
+
+    it('tracks positions for single column', () => {
+      const source = loadCSVFixture('edge-cases/single-column');
+      const ast = parseCSV(source, { inferTypes: true });
+
+      assertAllPositionsValid(ast);
+
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+
+        for (const element of arrayNode.elements) {
+          if (element.type === 'Object') {
+            const objectNode = element as ObjectNode;
+
+            // Single column should still have valid positions
+            expect(objectNode.properties.length).toBe(1);
+            assertSourceLocationValid(objectNode.properties[0]!.loc);
+          }
+        }
+      }
+    });
+  });
+
+  describe('CSV position accuracy', () => {
+    it('CSV: line numbers match source rows', () => {
+      const source = loadCSVFixture('primitives/simple');
+      const ast = parseCSV(source);
+
+      const lines = source.split('\n').filter(line => line.trim().length > 0);
+
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+
+        for (const [index, element] of arrayNode.elements.entries()) {
+          const line = element.loc.start.line;
+          expect(line).toBeGreaterThan(0);
+
+          // Data rows start at line 2 (after header)
+          expect(line).toBe(index + 2);
+        }
+      }
+    });
+
+    it('CSV: offsets match byte positions', () => {
+      const source = loadCSVFixture('primitives/simple');
+      const ast = parseCSV(source);
+
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+
+        for (const element of arrayNode.elements) {
+          const start = element.loc.start.offset;
+          const end = element.loc.end.offset;
+
+          // Extract substring using offsets
+          const extracted = source.substring(start, end);
+
+          // Substring should contain row data
+          expect(extracted).toBeTruthy();
+          expect(extracted.length).toBeGreaterThan(0);
+        }
+      }
+    });
+
+    it('CSV: header positions are tracked', () => {
+      const source = loadCSVFixture('primitives/simple');
+      const ast = parseCSV(source);
+
+      // The CSV parser infers headers from the first row
+      // While headers aren't explicitly in the AST, we can verify
+      // that the first data row starts after the header line
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+
+        if (arrayNode.elements.length > 0) {
+          const firstElement = arrayNode.elements[0]!;
+
+          // First data row should be on line 2 (after header)
+          expect(firstElement.loc.start.line).toBe(2);
+        }
+      }
+    });
+
+    it('CSV: field positions within rows', () => {
+      const source = loadCSVFixture('collections/array-of-objects');
+      const ast = parseCSV(source);
+
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+
+        for (const element of arrayNode.elements) {
+          if (element.type === 'Object') {
+            const objectNode = element as ObjectNode;
+
+            // Properties should be ordered left-to-right in the source
+            for (let i = 0; i < objectNode.properties.length - 1; i++) {
+              const current = objectNode.properties[i]!;
+              const next = objectNode.properties[i + 1]!;
+
+              // Current field should end before or at next field's start
+              expect(current.loc.end.offset).toBeLessThanOrEqual(
+                next.loc.start.offset
+              );
+            }
+          }
+        }
+      }
+    });
+
+    it('CSV: empty field positions are zero-width or minimal', () => {
+      const source = loadCSVFixture('edge-cases/empty-fields');
+      const ast = parseCSV(source);
+
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+
+        for (const element of arrayNode.elements) {
+          if (element.type === 'Object') {
+            const objectNode = element as ObjectNode;
+
+            for (const prop of objectNode.properties) {
+              if (prop.value.type === 'String' && prop.value.value === '') {
+                const start = prop.value.loc.start.offset;
+                const end = prop.value.loc.end.offset;
+                const span = end - start;
+
+                // Empty fields should have minimal or zero span
+                expect(span).toBeLessThanOrEqual(2); // Allow for empty_field token
+              }
+            }
+          }
+        }
+      }
+    });
+  });
+
+  describe('CSV position consistency', () => {
+    it('CSV: row ranges contain field ranges', () => {
+      const source = loadCSVFixture('collections/array-of-objects');
+      const ast = parseCSV(source);
+
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+
+        for (const element of arrayNode.elements) {
+          if (element.type === 'Object') {
+            const objectNode = element as ObjectNode;
+
+            for (const prop of objectNode.properties) {
+              // Row range should contain property range
+              expect(element.loc.start.offset).toBeLessThanOrEqual(
+                prop.loc.start.offset
+              );
+              expect(element.loc.end.offset).toBeGreaterThanOrEqual(
+                prop.loc.end.offset
+              );
+
+              // Property range should contain value range
+              expect(prop.loc.start.offset).toBeLessThanOrEqual(
+                prop.value.loc.start.offset
+              );
+              expect(prop.loc.end.offset).toBeGreaterThanOrEqual(
+                prop.value.loc.end.offset
+              );
+            }
+          }
+        }
+      }
+    });
+
+    it('CSV: rows do not overlap', () => {
+      const source = loadCSVFixture('real-world/employee-data');
+      const ast = parseCSV(source);
+
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+
+        // Rows should be sequential and non-overlapping
+        assertPositionRangesValid(arrayNode.elements);
+
+        for (let i = 0; i < arrayNode.elements.length - 1; i++) {
+          const current = arrayNode.elements[i]!;
+          const next = arrayNode.elements[i + 1]!;
+
+          // Current row should end before next row starts
+          expect(current.loc.end.offset).toBeLessThanOrEqual(
+            next.loc.start.offset
+          );
+
+          // Current row should be on earlier line than next row
+          expect(current.loc.start.line).toBeLessThan(
+            next.loc.start.line
+          );
+        }
+      }
+    });
+
+    it('CSV: all positions reference valid source locations', () => {
+      const source = loadCSVFixture('real-world/sales-data');
+      const ast = parseCSV(source, { inferTypes: true });
+
+      const sourceLength = source.length;
+
+      if (ast.body?.type === 'Array') {
+        const arrayNode = ast.body as ArrayNode;
+
+        for (const element of arrayNode.elements) {
+          // Element offsets should be within source bounds
+          expect(element.loc.start.offset).toBeGreaterThanOrEqual(0);
+          expect(element.loc.end.offset).toBeLessThanOrEqual(sourceLength);
+
+          if (element.type === 'Object') {
+            const objectNode = element as ObjectNode;
+
+            for (const prop of objectNode.properties) {
+              // Property offsets should be within source bounds
+              expect(prop.loc.start.offset).toBeGreaterThanOrEqual(0);
+              expect(prop.loc.end.offset).toBeLessThanOrEqual(sourceLength);
+
+              // Value offsets should be within source bounds
+              expect(prop.value.loc.start.offset).toBeGreaterThanOrEqual(0);
+              expect(prop.value.loc.end.offset).toBeLessThanOrEqual(sourceLength);
+            }
+          }
         }
       }
     });

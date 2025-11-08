@@ -1,0 +1,6 @@
+sku,name,price,in_stock,category
+WID-001,Widget,19.99,true,Tools
+GAD-002,Gadget,29.99,false,Electronics
+DOO-003,Doohickey,15.50,true,Tools
+THI-004,Thingamajig,45.00,true,Electronics
+WHO-005,Whatsit,12.99,false,Misc
