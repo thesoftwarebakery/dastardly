@@ -673,9 +673,9 @@ The integration test suite runs automatically with `pnpm -r test` to ensure comp
   - Flow and block styles in serialization
 
 ### CSV Package
-- **Status**: ✅ Complete
+- **Status**: ✅ Complete (Phase 1)
 - **Lines of Code**: ~700 production, ~1,100 tests
-- **Test Coverage**: 99 tests (95 passing, 4 skipped for documented grammar limitations)
+- **Test Coverage**: 99 tests (97 passing, 2 skipped for documented grammar limitations)
 - **Implementation Time**: ~20-25 hours (includes tree-sitter-csv migration)
 - **Key Files**:
   - `packages/csv/src/parser.ts` - 220 lines
@@ -691,11 +691,19 @@ The integration test suite runs automatically with `pnpm -r test` to ensure comp
   - Line ending options (LF, CRLF)
   - Nested structure handling (error, json, flatten)
   - Produces array-of-objects or array-of-arrays
-- **Known Limitations**:
-  - Empty fields not supported (grammar constraint)
-  - Single-character text fields not supported (grammar constraint)
-  - Variable field counts not supported (grammar constraint)
-  - See `packages/csv/LIMITATIONS.md` for details and proposed fixes
+- **Grammar Improvements**:
+  - ✅ Single-character text fields now supported (Phase 1)
+  - ✅ CRLF line endings now working (Phase 1)
+  - Grammar regex modified to allow zero-length text matching
+  - Unified whitespace handling with `\s`
+- **Known Limitations** (require external scanner - Phase 2):
+  - Empty fields not supported (tree-sitter prohibits empty-string rules)
+  - Variable field counts not supported (lower priority)
+  - See `packages/csv/LIMITATIONS.md` for technical details and research
+- **Tree-sitter Tooling**:
+  - Uses system tree-sitter CLI for grammar generation (development only)
+  - Commits generated `parser.c` files for consumers
+  - Post-processes `node-types.json` for CLI 0.25+ → runtime 0.21.1 compatibility
 
 ### Remaining Packages
 | Package | Status | Tree-Sitter Grammar | Estimated Effort |
