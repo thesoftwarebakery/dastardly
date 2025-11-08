@@ -11,21 +11,21 @@ export interface CSVSerializeOptions {
 
   /**
    * Quote strategy for fields.
-   * - 'needed': Only quote fields that need it (contain delimiter, quotes, or newlines)
+   * - 'needed': Only quote fields that need it (contain delimiter, quotes, newlines, or spaces)
    * - 'all': Quote all fields
    * - 'nonnumeric': Quote all non-numeric fields
    * - 'none': Never quote fields
    * @default 'needed'
    */
-  quoting?: QuoteStrategy;
+  quoteStrategy?: QuoteStrategy;
 
   /**
    * Line ending style.
-   * - 'lf': Unix-style (\n)
-   * - 'crlf': Windows-style (\r\n)
-   * @default 'lf'
+   * - 'LF': Unix-style (\n)
+   * - 'CRLF': Windows-style (\r\n)
+   * @default 'LF'
    */
-  lineEnding?: 'lf' | 'crlf';
+  lineEnding?: 'LF' | 'CRLF';
 
   /**
    * Whether to include headers.
@@ -34,7 +34,7 @@ export interface CSVSerializeOptions {
    * - string[]: Use provided headers
    * @default true
    */
-  headers?: boolean | string[];
+  includeHeaders?: boolean | string[];
 
   /**
    * How to handle nested objects/arrays.
@@ -52,9 +52,9 @@ export interface CSVSerializeOptions {
 export function serialize(node: DataNode, options: CSVSerializeOptions = {}): string {
   const {
     delimiter = ',',
-    quoting = 'needed',
-    lineEnding = 'lf',
-    headers = true,
+    quoteStrategy = 'needed',
+    lineEnding = 'LF',
+    includeHeaders = true,
     nestHandling = 'error',
   } = options;
 
@@ -102,11 +102,11 @@ export function serialize(node: DataNode, options: CSVSerializeOptions = {}): st
     }
 
     // Determine headers
-    if (headers === false) {
+    if (includeHeaders === false) {
       // No headers - just use keys in order they appear
       headerRow = [];
-    } else if (Array.isArray(headers)) {
-      headerRow = headers;
+    } else if (Array.isArray(includeHeaders)) {
+      headerRow = includeHeaders;
     } else {
       // Auto-generate from keys
       headerRow = Array.from(allKeys);
@@ -119,9 +119,9 @@ export function serialize(node: DataNode, options: CSVSerializeOptions = {}): st
     }
   } else {
     // Array of arrays
-    if (Array.isArray(headers)) {
-      headerRow = headers;
-    } else if (headers === true) {
+    if (Array.isArray(includeHeaders)) {
+      headerRow = includeHeaders;
+    } else if (includeHeaders === true) {
       // Can't auto-generate headers from arrays
       headerRow = [];
     } else {
@@ -149,19 +149,19 @@ export function serialize(node: DataNode, options: CSVSerializeOptions = {}): st
 
   // Add header row if present
   if (headerRow.length > 0) {
-    const quotedHeaders = headerRow.map((header) => applyQuoting(header, delimiter, quoting));
+    const quotedHeaders = headerRow.map((header) => applyQuoting(header, delimiter, quoteStrategy));
     lines.push(quotedHeaders.join(delimiter));
   }
 
   // Add data rows
   for (const row of dataRows) {
-    const quotedRow = row.map((field) => applyQuoting(field, delimiter, quoting));
+    const quotedRow = row.map((field) => applyQuoting(field, delimiter, quoteStrategy));
     lines.push(quotedRow.join(delimiter));
   }
 
   // Join with line ending
   const output = lines.join('\n');
-  return normalizeLineEnding(output, lineEnding);
+  return normalizeLineEnding(output, lineEnding.toLowerCase() as 'lf' | 'crlf');
 }
 
 /**

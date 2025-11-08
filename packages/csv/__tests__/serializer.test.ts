@@ -26,7 +26,7 @@ describe('CSV Serializer', () => {
         arrayNode([stringNode('Bob'), numberNode(25)]),
       ]);
 
-      const result = serialize(data, { headers: false });
+      const result = serialize(data, { includeHeaders: false });
       expect(result).toBe('Alice,30\nBob,25');
     });
 
@@ -93,7 +93,7 @@ describe('CSV Serializer', () => {
         ]),
       ]);
 
-      const result = serialize(data, { quoting: 'all' });
+      const result = serialize(data, { quoteStrategy: 'all' });
       expect(result).toBe('"a","b"\n"simple","123"');
     });
 
@@ -105,7 +105,7 @@ describe('CSV Serializer', () => {
         ]),
       ]);
 
-      const result = serialize(data, { quoting: 'nonnumeric' });
+      const result = serialize(data, { quoteStrategy: 'nonnumeric' });
       expect(result).toBe('"a","b"\n"text",123');
     });
 
@@ -116,7 +116,7 @@ describe('CSV Serializer', () => {
         ]),
       ]);
 
-      const result = serialize(data, { quoting: 'none' });
+      const result = serialize(data, { quoteStrategy: 'none' });
       expect(result).toBe('a\nsimple');
     });
   });
@@ -187,7 +187,7 @@ describe('CSV Serializer', () => {
         arrayNode([stringNode('Bob'), numberNode(25)]),
       ]);
 
-      const result = serialize(data, { headers: ['Name', 'Age'] });
+      const result = serialize(data, { includeHeaders: ['Name', 'Age'] });
       expect(result).toBe('Name,Age\nAlice,30\nBob,25');
     });
 
@@ -306,7 +306,8 @@ describe('CSV Serializer', () => {
       ]);
 
       const result = serialize(data);
-      expect(result).toBe('text\n  spaces  ');
+      // Fields with spaces must be quoted for RFC 4180 compliance
+      expect(result).toBe('text\n"  spaces  "');
     });
 
     it('should convert numbers to strings', () => {

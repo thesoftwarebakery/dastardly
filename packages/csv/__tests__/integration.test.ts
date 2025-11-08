@@ -33,7 +33,7 @@ describe('Public API', () => {
 
     it('supports different quoting strategies', () => {
       const doc = parse('text\nhello');
-      const csv = serialize(doc, { quoting: 'all' });
+      const csv = serialize(doc, { quoteStrategy: 'all' });
       expect(csv).toBe('"text"\n"hello"');
     });
 
@@ -178,7 +178,7 @@ describe('Public API', () => {
       const doc = parser.parse('Alice,30\nBob,25');
 
       const csv = serialize(doc.body, {
-        headers: ['Name', 'Age'],
+        includeHeaders: ['Name', 'Age'],
       });
       expect(csv).toBe('Name,Age\nAlice,30\nBob,25');
     });

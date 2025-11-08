@@ -86,12 +86,14 @@ export function needsQuoting(
 
     case 'needed':
     default: {
-      // Quote if contains delimiter, quotes, or newlines
+      // Quote if contains delimiter, quotes, newlines, or spaces
+      // Spaces require quoting per RFC 4180 for proper parsing
       return (
         value.includes(delimiter) ||
         value.includes('"') ||
         value.includes('\n') ||
-        value.includes('\r')
+        value.includes('\r') ||
+        value.includes(' ')
       );
     }
   }
