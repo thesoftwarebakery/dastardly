@@ -42,7 +42,7 @@
     "tree-sitter-cli": "^0.20.8"
   },
   "scripts": {
-    "build": "npm run build-csv && npm run build-psv && npm run build-tsv",
+    "generate": "npm run build-csv && npm run build-psv && npm run build-tsv",
     "build-csv": "cd csv && tree-sitter generate --no-bindings",
     "build-psv": "cd psv && tree-sitter generate --no-bindings",
     "build-tsv": "cd tsv && tree-sitter generate --no-bindings",

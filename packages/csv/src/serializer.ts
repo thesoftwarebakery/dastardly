@@ -195,11 +195,19 @@ function flattenObject(obj: ObjectNode, prefix = ''): ObjectNode {
       flattened.push(...nestedFlattened.properties);
     } else {
       // Non-object value - add with flattened key
-      flattened.push(propertyNode(stringNode(key), prop.value));
+      // Synthetic key gets original key's location, value preserves its location
+      flattened.push(
+        propertyNode(
+          stringNode(key, prop.key.loc),
+          prop.value,
+          prop.loc
+        )
+      );
     }
   }
 
-  return objectNode(flattened);
+  // Synthetic object gets original object's location
+  return objectNode(flattened, obj.loc);
 }
 
 /**

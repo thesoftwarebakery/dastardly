@@ -1,6 +1,7 @@
 import {
   type DocumentNode,
   type DataNode,
+  type SourceLocation,
   documentNode,
   arrayNode,
   objectNode,
@@ -69,28 +70,28 @@ function selectGrammar(delimiter: string): LanguageWrapper {
 /**
  * Infer the type of a field value
  */
-function inferType(value: string, inferTypes: boolean): DataNode {
+function inferType(value: string, inferTypes: boolean, loc: SourceLocation): DataNode {
   if (!inferTypes) {
-    return stringNode(value);
+    return stringNode(value, loc);
   }
 
   // Check for null
   if (value === 'null' || value === 'NULL') {
-    return nullNode();
+    return nullNode(loc);
   }
 
   // Check for boolean
   if (value === 'true' || value === 'false') {
-    return booleanNode(value === 'true');
+    return booleanNode(value === 'true', loc);
   }
 
   // Check for number
   const num = parseFloat(value);
   if (!isNaN(num) && value.trim() !== '') {
-    return numberNode(num);
+    return numberNode(num, loc);
   }
 
-  return stringNode(value);
+  return stringNode(value, loc);
 }
 
 export class CSVParser extends TreeSitterParser {
@@ -119,8 +120,10 @@ export class CSVParser extends TreeSitterParser {
 
     // Empty CSV
     if (rows.length === 0) {
+      const loc = nodeToLocation(node, this.sourceFormat);
       return documentNode(
-        arrayNode([], nodeToLocation(node, this.sourceFormat)),
+        arrayNode([], loc),
+        loc
       );
     }
 
@@ -133,6 +136,7 @@ export class CSVParser extends TreeSitterParser {
       // First row is headers
       headerRow = rows[0] ?? null;
       if (headerRow) {
+        // Literal false matches overload, returns string[]
         headerNames = this.extractFieldValues(headerRow, source, false);
         dataRows = rows.slice(1);
       }
@@ -163,11 +167,7 @@ export class CSVParser extends TreeSitterParser {
           if (value === undefined) {
             valueNode = stringNode('', fieldLoc);
           } else if (typeof value === 'string') {
-            valueNode = inferType(value, this.options.inferTypes);
-            // Add location to the inferred node if it doesn't have one
-            if (!valueNode.loc) {
-              valueNode = { ...valueNode, loc: fieldLoc };
-            }
+            valueNode = inferType(value, this.options.inferTypes, fieldLoc);
           } else {
             // value is already a DataNode with location
             valueNode = value;
@@ -177,7 +177,7 @@ export class CSVParser extends TreeSitterParser {
           const headerFieldNode = headerRow ? this.getFieldNode(headerRow, index) : null;
           const keyLoc = headerFieldNode
             ? nodeToLocation(headerFieldNode, this.sourceFormat)
-            : undefined;
+            : fieldLoc; // Fallback to field location if no header node
 
           return propertyNode(
             stringNode(header, keyLoc),
@@ -193,14 +193,14 @@ export class CSVParser extends TreeSitterParser {
       dataNodes = dataRows.map((row) => {
         const fieldValues = this.extractFieldValues(row, source, this.options.inferTypes);
         const children = fieldValues.map((value, index) => {
-          const valueNode = typeof value === 'string'
-            ? inferType(value, this.options.inferTypes)
-            : value;
-
           const fieldNode = this.getFieldNode(row, index);
-          if (fieldNode) {
-            valueNode.location = nodeToLocation(fieldNode, this.sourceFormat);
-          }
+          const fieldLoc = fieldNode
+            ? nodeToLocation(fieldNode, this.sourceFormat)
+            : nodeToLocation(row, this.sourceFormat);
+
+          const valueNode = typeof value === 'string'
+            ? inferType(value, this.options.inferTypes, fieldLoc)
+            : value;
 
           return valueNode;
         });
@@ -216,17 +216,24 @@ export class CSVParser extends TreeSitterParser {
 
     return documentNode(
       arrayNode(dataNodes, arrayLoc),
+      nodeToLocation(node, this.sourceFormat)
     );
   }
 
   /**
-   * Extract field values from a row node
+   * Extract field values from a row node.
+   * When inferTypes is false (literal), returns string[].
+   * When inferTypes is true (literal), returns (string | DataNode)[].
+   * When inferTypes is runtime boolean, returns union type.
    */
+  private extractFieldValues(row: SyntaxNode, source: string, inferTypes: false): string[];
+  private extractFieldValues(row: SyntaxNode, source: string, inferTypes: true): (string | DataNode)[];
+  private extractFieldValues(row: SyntaxNode, source: string, inferTypes: boolean): string[] | (string | DataNode)[];
   private extractFieldValues(
     row: SyntaxNode,
     source: string,
     inferTypes: boolean,
-  ): (string | DataNode)[] {
+  ): string[] | (string | DataNode)[] {
     const fields: (string | DataNode)[] = [];
 
     for (const child of row.children) {
@@ -259,7 +266,7 @@ export class CSVParser extends TreeSitterParser {
       case 'text': {
         const text = child.text;
         const unescaped = unescapeField(text);
-        return inferTypes ? inferType(unescaped, true) : unescaped;
+        return inferTypes ? inferType(unescaped, true, location) : unescaped;
       }
       case 'number': {
         const num = parseInt(child.text, 10);
