@@ -33,6 +33,10 @@
           "named": true
         },
         {
+          "type": "empty_field",
+          "named": true
+        },
+        {
           "type": "float",
           "named": true
         },
@@ -63,7 +67,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "field",
@@ -71,6 +75,10 @@
         }
       ]
     }
+  },
+  {
+    "type": "empty_field",
+    "named": true
   },
   {
     "type": "false",

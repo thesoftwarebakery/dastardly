@@ -23,17 +23,24 @@ module.exports = function defineGrammar(dialect, separator) {
   return grammar({
     name: dialect,
 
+    externals: $ => [
+      $.empty_field,
+      $._error_sentinel,
+    ],
+
     rules: {
-      document: $ => seq(
-        repeat(seq($.row, /\r|\r\n|\n/)),
+      document: $ => choice(
+        seq(repeat1(seq($.row, /\r|\r\n|\n/)), optional($.row)),
         optional($.row),
       ),
 
-      row: $ => choice(
-        seq(repeat(separator), $.field, repeat(seq(repeat(separator), $.field)), repeat(separator)),
-        repeat1(separator),
+      row: $ => seq(
+        optional(separator),
+        $.field,
+        repeat(seq(separator, $.field)),
+        optional(separator),
       ),
-      field: $ => choice($.text, $.number, $.float, $.boolean),
+      field: $ => choice($.text, $.number, $.float, $.boolean, $.empty_field),
 
       text: _ => token(choice(
         new RegExp(`[^${separator}\\d\\s"][^${separator}\\s"]*`),
