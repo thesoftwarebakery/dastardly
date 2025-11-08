@@ -24,8 +24,16 @@
   "author": "Amaan Qureshi <amaanq12@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "nan": "^2.17.0",
+    "node-addon-api": "^8.2.2",
     "node-gyp-build": "^4.8.2"
+  },
+  "peerDependencies": {
+    "tree-sitter": "^0.21.1"
+  },
+  "peerDependenciesMeta": {
+    "tree-sitter": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "eslint": "^8.47.0",
@@ -35,9 +43,9 @@
   },
   "scripts": {
     "build": "npm run build-csv && npm run build-psv && npm run build-tsv",
-    "build-csv": "cd csv && npx tree-sitter generate --no-bindings",
-    "build-psv": "cd psv && npx tree-sitter generate --no-bindings",
-    "build-tsv": "cd tsv && npx tree-sitter generate --no-bindings",
+    "build-csv": "cd csv && tree-sitter generate --no-bindings",
+    "build-psv": "cd psv && tree-sitter generate --no-bindings",
+    "build-tsv": "cd tsv && tree-sitter generate --no-bindings",
     "install": "node-gyp-build",
     "prebuildify": "prebuildify --napi --strip",
     "lint": "eslint common/define-grammar.js csv/grammar.js tsv/grammar.js",
