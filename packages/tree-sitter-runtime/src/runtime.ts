@@ -21,6 +21,6 @@ export class NodeTreeSitterRuntime implements ParserRuntime {
   parse(source: string, oldTree?: SyntaxTree): SyntaxTree {
     const tree = this.parser.parse(source, oldTree as any);
     // tree-sitter Tree type is compatible with our SyntaxTree interface
-    return tree as unknown as SyntaxTree;
+    return tree;
   }
 }
