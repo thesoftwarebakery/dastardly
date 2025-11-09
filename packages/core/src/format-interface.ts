@@ -59,10 +59,6 @@ export interface BaseSerializeOptions {
  *     // Parse CSV to AST using options
  *   },
  *
- *   parseValue(source, options) {
- *     return this.parse(source, options).body;
- *   },
- *
  *   serialize(node, options) {
  *     // Serialize AST to CSV
  *   }
@@ -95,28 +91,6 @@ export interface FormatPackage<
    * ```
    */
   parse(source: string, options?: TParseOptions): DocumentNode;
-
-  /**
-   * Parse source and return just the body (DataNode).
-   *
-   * Convenience method equivalent to `parse(source, options).body`.
-   * Useful when you only need the data structure without document wrapper.
-   *
-   * @param source - Source text in the format
-   * @param options - Format-specific parse options (optional)
-   * @returns DataNode AST (document body without wrapper)
-   * @throws ParseError if source is invalid or malformed
-   *
-   * @example
-   * ```typescript
-   * import { csv } from '@dastardly/csv';
-   *
-   * // Parse without headers
-   * const data = csv.parseValue('Alice,30\nBob,25', { headers: false });
-   * console.log(data.type); // 'Array' (not 'Document')
-   * ```
-   */
-  parseValue(source: string, options?: TParseOptions): DataNode;
 
   /**
    * Serialize a dASTardly AST node to format-specific text.

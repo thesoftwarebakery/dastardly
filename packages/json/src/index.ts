@@ -4,13 +4,10 @@ import type { DocumentNode, DataNode, FormatPackage } from '@dastardly/core';
 import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
 import JSON_LANGUAGE from 'tree-sitter-json';
 
-// Re-export main classes and types
-export { JSONParser } from './parser.js';
+// Export public types
 export type { JSONSerializeOptions } from './serializer.js';
 
-// Re-export utilities
-export { escapeString, unescapeString, normalizeIndent } from './utils.js';
-
+// Import internal classes
 import { JSONParser } from './parser.js';
 import { serialize as serializeNode, type JSONSerializeOptions } from './serializer.js';
 
@@ -50,19 +47,6 @@ export const json: FormatPackage<JSONSerializeOptions> = {
   },
 
   /**
-   * Parse JSON string and return just the body (DataNode).
-   * Convenience for parse(source).body
-   *
-   * @param source - JSON string to parse
-   * @param options - Parse options (not used for JSON)
-   * @returns DataNode AST
-   * @throws ParseError if source is invalid JSON
-   */
-  parseValue(source, options): DataNode {
-    return this.parse(source, options).body;
-  },
-
-  /**
    * Serialize a dASTardly AST node to JSON string.
    *
    * @param node - DocumentNode or DataNode to serialize
@@ -75,4 +59,4 @@ export const json: FormatPackage<JSONSerializeOptions> = {
 };
 
 // Convenience exports for destructuring
-export const { parse, parseValue, serialize } = json;
+export const { parse, serialize } = json;

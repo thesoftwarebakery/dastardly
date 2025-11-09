@@ -175,26 +175,50 @@ pnpm --filter @dastardly/json test
   - [x] Grammar modifications for external scanner integration
   - [x] Zero-width token detection for empty fields
   - [x] Support all three variants (CSV, TSV, PSV)
-- [x] Comprehensive tests - 99 tests total (98 passing, 1 skipped for variable field counts)
+- [x] **Phase 3: Parse options support and integration testing**
+  - [x] Extend FormatPackage interface to support parse options
+  - [x] Implement CSVParseOptions (inferTypes, delimiter, headers)
+  - [x] Add CSV to integration tests (cross-format, roundtrip, position tracking)
+  - [x] All integration tests passing (161 tests: 77 CSV-specific)
+- [x] Comprehensive unit tests - 142 tests total (141 passing, 1 skipped for variable field counts)
 - [x] Document remaining limitations (variable field counts - lower priority)
 - [x] Create comprehensive README with API documentation and examples
-
-**Next Immediate Step**: Add CSV to integration tests (cross-format conversions, roundtrip, position tracking) - Est. 3-5 hours
 
 ### Phase 2: Additional Formats
 
 When implementing a new format package:
 
-1. **Create package structure** following JSON/YAML examples
-2. **Implement `FormatPackage<TOptions>` interface**:
-   - Export object implementing all required methods (`parse`, `parseValue`, `serialize`)
+1. **Create package structure** following JSON/YAML/CSV examples
+2. **Implement `FormatPackage<TSerializeOptions, TParseOptions>` interface**:
+   - Export object implementing all required methods (`parse`, `serialize`)
    - Define format-specific `FormatSerializeOptions` extending `BaseSerializeOptions`
-   - Export destructured convenience functions
-3. **Extend `TreeSitterParser`** for parser implementation
+   - Define format-specific `FormatParseOptions` extending `BaseParseOptions` (if needed)
+   - `TParseOptions` defaults to `BaseParseOptions` for formats without parse-time options
+   - Export destructured convenience functions (`parse`, `serialize`)
+   - Export public types (`FormatSerializeOptions`, `FormatParseOptions`)
+   - Keep Parser classes and utility functions internal (not exported)
+3. **Extend `TreeSitterParser`** for parser implementation (internal)
 4. **Add comprehensive tests** matching existing packages (95%+ coverage)
 5. **Update documentation** with format-specific behavior
 
 The TypeScript compiler enforces the `FormatPackage` interface contract.
+
+**Public API Pattern**:
+```typescript
+// Export package object implementing FormatPackage
+export const formatName: FormatPackage<FormatSerializeOptions, FormatParseOptions> = {
+  parse(source, options) { /* ... */ },
+  serialize(node, options) { /* ... */ }
+};
+
+// Export convenience functions (destructured from package object)
+export const { parse, serialize } = formatName;
+
+// Export public types
+export type { FormatSerializeOptions, FormatParseOptions };
+
+// Parser classes, utility functions remain internal (not exported)
+```
 
 **Upcoming formats**:
 - [ ] XML support (attributes, namespaces)

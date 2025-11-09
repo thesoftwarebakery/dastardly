@@ -5,11 +5,11 @@ High-performance CSV/TSV/PSV parser and serializer for dASTardly, built with Tre
 ## Installation
 
 ```bash
-npm install @dastardly/csv
+npm install @dastardly/csv @dastardly/core
 ```
 
 ```bash
-pnpm add @dastardly/csv
+pnpm add @dastardly/csv @dastardly/core
 ```
 
 ## Overview
@@ -31,17 +31,19 @@ pnpm add @dastardly/csv
 ### Parsing
 
 ```typescript
-import { parse, parseValue } from '@dastardly/csv';
+import { parse } from '@dastardly/csv';
 
 // Parse CSV with headers to DocumentNode
 const doc = parse('name,age\nAlice,30\nBob,25');
+console.log(doc.type); // 'Document'
 console.log(doc.body.type); // 'Array'
-console.log(doc.body.elements[0].type); // 'Object'
 
-// Parse to DataNode (just the value)
-const data = parseValue('name,age\nAlice,30\nBob,25');
-console.log(data.type); // 'Array'
-console.log(data.elements.length); // 2
+// Access the data directly
+const data = doc.body;
+if (data.type === 'Array') {
+  console.log(data.elements.length); // 2
+  // Each element is an Object with properties from headers
+}
 ```
 
 ### Serializing
@@ -50,19 +52,19 @@ console.log(data.elements.length); // 2
 import { serialize } from '@dastardly/csv';
 
 // Serialize with default options (comma delimiter, auto-headers)
-const csv = serialize(ast);
+const csv = serialize(doc);
 // name,age
 // Alice,30
 // Bob,25
 
 // Serialize as TSV (tab-separated)
-const tsv = serialize(ast, { delimiter: '\t' });
+const tsv = serialize(doc, { delimiter: '\t' });
 // name	age
 // Alice	30
 // Bob	25
 
 // Serialize with all fields quoted
-const quoted = serialize(ast, { quoting: 'all' });
+const quoted = serialize(doc, { quoting: 'all' });
 // "name","age"
 // "Alice","30"
 // "Bob","25"
@@ -74,51 +76,71 @@ const quoted = serialize(ast, { quoting: 'all' });
 import { parse, serialize } from '@dastardly/csv';
 
 const source = 'name,age\nAlice,30\nBob,25';
-const ast = parse(source);
-const output = serialize(ast);
+const doc = parse(source);
+const output = serialize(doc);
 // Preserves data structure, can reformat with different options
 ```
 
 ## API Reference
 
+### Package Object
+
+The package exports a `csv` object implementing the `FormatPackage` interface:
+
+```typescript
+import { csv } from '@dastardly/csv';
+
+const doc = csv.parse('name,age\nAlice,30', { inferTypes: true });
+const output = csv.serialize(doc, { delimiter: '\t' });
+```
+
 ### Convenience Functions
 
-#### `parse(source)`
+For convenience, `parse` and `serialize` are also exported as standalone functions:
+
+#### `parse(source, options?)`
 
 Parse CSV string into a DocumentNode:
 
 ```typescript
-function parse(source: string): DocumentNode;
+function parse(
+  source: string,
+  options?: CSVParseOptions
+): DocumentNode;
 ```
+
+**Parameters:**
+- `source` - CSV string to parse
+- `options` - Optional parse options:
+  - `delimiter?: string` - Field delimiter (`,`, `\t`, or `|`). Default: `,`
+  - `headers?: boolean | string[]` - Header handling:
+    - `true` (default) - First row is headers
+    - `false` - No headers (produces array of arrays)
+    - `string[]` - Custom header names
+  - `inferTypes?: boolean` - Auto-detect numbers and booleans. Default: `false`
 
 **Example:**
 
 ```typescript
 import { parse } from '@dastardly/csv';
 
-const doc = parse('name,age\nAlice,30');
-console.log(doc.type); // 'Document'
-console.log(doc.body.type); // 'Array'
-```
+// Basic parsing with headers
+const doc1 = parse('name,age\nAlice,30');
+console.log(doc1.body.type); // 'Array'
 
-**Throws:** `ParseError` if source is invalid CSV
+// Parse with type inference
+const doc2 = parse('name,score\nAlice,100', { inferTypes: true });
+// score will be Number(100) instead of String("100")
 
-#### `parseValue(source)`
+// Parse without headers (array of arrays)
+const doc3 = parse('Alice,30\nBob,25', { headers: false });
+// Produces: [["Alice", "30"], ["Bob", "25"]]
 
-Parse CSV string and return just the body (DataNode):
-
-```typescript
-function parseValue(source: string): DataNode;
-```
-
-**Example:**
-
-```typescript
-import { parseValue } from '@dastardly/csv';
-
-const data = parseValue('name,age\nAlice,30');
-console.log(data.type); // 'Array'
-// No need to access .body
+// Parse TSV with custom headers
+const doc4 = parse('Alice\t30\nBob\t25', {
+  delimiter: '\t',
+  headers: ['name', 'age']
+});
 ```
 
 **Throws:** `ParseError` if source is invalid CSV
@@ -135,583 +157,281 @@ function serialize(
 ```
 
 **Parameters:**
-- `node` - DocumentNode or DataNode to serialize (must be an Array of Objects or Array of Arrays)
-- `options` - Optional CSV serialization options
+- `node` - DocumentNode or DataNode to serialize (must be Array of Objects or Array of Arrays)
+- `options` - Optional serialization options:
+  - `delimiter?: string` - Field delimiter. Default: `,`
+  - `quoting?: 'needed' | 'all' | 'nonnumeric' | 'none'` - Quote strategy. Default: `'needed'`
+  - `lineEnding?: '\n' | '\r\n'` - Line ending style. Default: `'\n'`
+  - `headers?: boolean | string[]` - Header handling:
+    - `true` (default for Objects) - Auto-generate from object keys
+    - `false` - No header row
+    - `string[]` - Custom header names
 
 **Example:**
 
 ```typescript
 import { serialize } from '@dastardly/csv';
 
-// Default (comma delimiter, auto headers)
-serialize(ast);
+// Default: comma-separated with auto-headers
+serialize(doc);
 // name,age
 // Alice,30
 
-// TSV with CRLF line endings
-serialize(ast, { delimiter: '\t', lineEnding: 'crlf' });
+// Tab-separated (TSV)
+serialize(doc, { delimiter: '\t' });
+// name	age
+// Alice	30
 
-// Custom headers
-serialize(ast, { headers: ['Name', 'Age'] });
+// Pipe-separated (PSV)
+serialize(doc, { delimiter: '|' });
+// name|age
+// Alice|30
+
+// Quote all fields
+serialize(doc, { quoting: 'all' });
+// "name","age"
+// "Alice","30"
+
+// Quote only non-numeric fields
+serialize(doc, { quoting: 'nonnumeric' });
+// "name",age
+// "Alice",30
+
+// Custom line endings (Windows-style)
+serialize(doc, { lineEnding: '\r\n' });
+
+// No headers
+serialize(doc, { headers: false });
+// Alice,30
+// Bob,25
 ```
 
-### Classes
+## Types
 
-#### `CSVParser`
+### `CSVParseOptions`
 
-Reusable CSV parser instance with configurable options:
-
-```typescript
-class CSVParser extends TreeSitterParser {
-  constructor(
-    runtime: ParserRuntime,
-    languageWrapper: LanguageWrapper,
-    options?: CSVParseOptions
-  );
-  parse(source: string): DocumentNode;
-}
-```
-
-**Parse Options:**
+Options for CSV parsing:
 
 ```typescript
 interface CSVParseOptions {
-  headers?: boolean | string[];  // Default: true
-  delimiter?: ',' | '\t' | '|' | string;  // Default: ','
-  inferTypes?: boolean;  // Default: false
+  /** Field delimiter (`,`, `\t`, `|`). Default: `,` */
+  delimiter?: string;
+
+  /**
+   * Header handling:
+   * - `true` (default): First row is headers
+   * - `false`: No headers (array of arrays)
+   * - `string[]`: Custom header names
+   */
+  headers?: boolean | string[];
+
+  /** Auto-detect and convert numbers/booleans. Default: `false` */
+  inferTypes?: boolean;
 }
 ```
 
-- `headers`:
-  - `true` (default): Auto-detect headers from first row, produce array-of-objects
-  - `false`: No headers, produce array-of-arrays
-  - `string[]`: Use provided header names, produce array-of-objects
-- `delimiter`: Field separator (`,` for CSV, `\t` for TSV, `|` for PSV)
-- `inferTypes`: Automatically convert numbers and booleans from strings
+### `CSVSerializeOptions`
 
-**Example:**
-
-```typescript
-import { CSVParser } from '@dastardly/csv';
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
-import CSV_LANGUAGE from '@dastardly/tree-sitter-csv';
-
-const runtime = new NodeTreeSitterRuntime();
-
-// CSV with type inference
-const csvParser = new CSVParser(runtime, CSV_LANGUAGE.csv, {
-  headers: true,
-  inferTypes: true
-});
-
-const doc1 = csvParser.parse('name,age\nAlice,30\nBob,25');
-// Result: [{ name: 'Alice', age: 30 }, { name: 'Bob', age: 25 }]
-// Note: ages are numbers, not strings
-
-// TSV without headers (array-of-arrays)
-const tsvParser = new CSVParser(runtime, CSV_LANGUAGE.tsv, {
-  headers: false,
-  delimiter: '\t'
-});
-
-const doc2 = tsvParser.parse('Alice\t30\nBob\t25');
-// Result: [['Alice', '30'], ['Bob', '25']]
-```
-
-#### `serialize(node, options)`
-
-Advanced serialization with full options:
+Options for CSV serialization:
 
 ```typescript
 interface CSVSerializeOptions {
-  delimiter?: ',' | '\t' | '|' | string;  // Default: ','
-  quoting?: 'needed' | 'all' | 'nonnumeric' | 'none';  // Default: 'needed'
-  lineEnding?: 'lf' | 'crlf';  // Default: 'lf'
-  headers?: boolean | string[];  // Default: true
-  nestHandling?: 'error' | 'json' | 'flatten';  // Default: 'error'
+  /** Field delimiter. Default: `,` */
+  delimiter?: string;
+
+  /**
+   * Quote strategy:
+   * - `'needed'`: Quote fields that require it (contains delimiter, newline, quote)
+   * - `'all'`: Quote all fields
+   * - `'nonnumeric'`: Quote non-numeric fields
+   * - `'none'`: Never quote (may produce invalid CSV)
+   */
+  quoting?: 'needed' | 'all' | 'nonnumeric' | 'none';
+
+  /** Line ending style. Default: `'\n'` */
+  lineEnding?: '\n' | '\r\n';
+
+  /**
+   * Header handling:
+   * - `true` (default for Objects): Auto-generate from keys
+   * - `false`: No header row
+   * - `string[]`: Custom header names
+   */
+  headers?: boolean | string[];
 }
-
-function serialize(
-  node: DocumentNode | DataNode,
-  options?: CSVSerializeOptions
-): string;
 ```
 
-**Options:**
+## Position Tracking
 
-- `delimiter`: Field separator
-  - `','` (default): Comma-separated (CSV)
-  - `'\t'`: Tab-separated (TSV)
-  - `'|'`: Pipe-separated (PSV)
-  - Custom string
-
-- `quoting`: When to quote fields
-  - `'needed'` (default): Quote only when necessary (contains delimiter, quotes, or newlines)
-  - `'all'`: Quote all fields
-  - `'nonnumeric'`: Quote all non-numeric fields
-  - `'none'`: Never quote (unsafe if data contains special characters)
-
-- `lineEnding`: Line terminator
-  - `'lf'` (default): Unix-style (`\n`)
-  - `'crlf'`: Windows-style (`\r\n`)
-
-- `headers`: Header row handling
-  - `true` (default): Auto-generate from object keys (for array-of-objects)
-  - `false`: No headers
-  - `string[]`: Use provided headers
-
-- `nestHandling`: How to handle nested objects/arrays
-  - `'error'` (default): Throw error on nested structures
-  - `'json'`: JSON.stringify nested structures
-  - `'flatten'`: Flatten nested objects with dot notation (e.g., `address.city`)
-
-**Example:**
+Every node in the AST includes position information:
 
 ```typescript
-import { serialize } from '@dastardly/csv';
+import { parse } from '@dastardly/csv';
 
-// TSV with all fields quoted and CRLF
-const tsv = serialize(ast, {
-  delimiter: '\t',
-  quoting: 'all',
-  lineEnding: 'crlf'
-});
-// "name"	"age"
-// "Alice"	"30"
-// "Bob"	"25"
+const doc = parse('name,age\nAlice,30');
 
-// PSV with only non-numeric values quoted
-const psv = serialize(ast, {
-  delimiter: '|',
-  quoting: 'nonnumeric'
-});
-// "name"|"age"
-// "Alice"|30
-// "Bob"|25
+// Position info on every node
+console.log(doc.loc);
+// {
+//   start: { line: 1, column: 0, offset: 0 },
+//   end: { line: 2, column: 8, offset: 17 }
+// }
 
-// Nested objects with JSON stringification
-const csv = serialize(nestedAst, {
-  nestHandling: 'json'
-});
-// name,address
-// Alice,"{""city"":""NYC""}"
-
-// Flattened nested objects
-const flattened = serialize(nestedAst, {
-  nestHandling: 'flatten'
-});
-// name,address.city,address.zip
-// Alice,NYC,10001
+// Even individual cells have positions
+const data = doc.body;
+if (data.type === 'Array' && data.elements[0]?.type === 'Object') {
+  const firstRow = data.elements[0];
+  console.log(firstRow.properties[0]?.value.loc);
+  // Position of "Alice" in the CSV
+}
 ```
 
-### Utilities
-
-#### `escapeField(value, delimiter)`
-
-Escape a field value for CSV output:
-
-```typescript
-function escapeField(value: string, delimiter: string): string;
-```
-
-**Example:**
-
-```typescript
-import { escapeField } from '@dastardly/csv';
-
-escapeField('Hello, world', ',');  // '"Hello, world"'
-escapeField('She said "hi"', ','); // '"She said ""hi"""'
-escapeField('Simple', ',');        // 'Simple'
-```
-
-#### `unescapeField(value)`
-
-Unescape a CSV field value:
-
-```typescript
-function unescapeField(value: string): string;
-```
-
-**Example:**
-
-```typescript
-import { unescapeField } from '@dastardly/csv';
-
-unescapeField('"Hello, world"');      // 'Hello, world'
-unescapeField('"She said ""hi"""');   // 'She said "hi"'
-unescapeField('Simple');              // 'Simple'
-```
-
-#### `needsQuoting(value, delimiter, strategy)`
-
-Determine if a field needs quoting:
-
-```typescript
-function needsQuoting(
-  value: string,
-  delimiter: string,
-  quoting: QuoteStrategy
-): boolean;
-```
-
-**Example:**
-
-```typescript
-import { needsQuoting } from '@dastardly/csv';
-
-needsQuoting('simple', ',', 'needed');     // false
-needsQuoting('Hello, world', ',', 'needed'); // true
-needsQuoting('123', ',', 'nonnumeric');    // false
-needsQuoting('text', ',', 'nonnumeric');   // true
-needsQuoting('anything', ',', 'all');      // true
-needsQuoting('anything', ',', 'none');     // false
-```
-
-#### `parseCSVNumber(text)`
-
-Parse a number from CSV text:
-
-```typescript
-function parseCSVNumber(text: string): number;
-```
-
-**Example:**
-
-```typescript
-import { parseCSVNumber } from '@dastardly/csv';
-
-parseCSVNumber('42');      // 42
-parseCSVNumber('3.14');    // 3.14
-parseCSVNumber('-10');     // -10
-parseCSVNumber('1.5e2');   // 150
-```
-
-#### `normalizeLineEnding(text, style)`
-
-Normalize line endings in text:
-
-```typescript
-function normalizeLineEnding(text: string, style: 'crlf' | 'lf'): string;
-```
-
-**Example:**
-
-```typescript
-import { normalizeLineEnding } from '@dastardly/csv';
-
-normalizeLineEnding('a\nb\nc', 'crlf');     // 'a\r\nb\r\nc'
-normalizeLineEnding('a\r\nb\r\nc', 'lf');   // 'a\nb\nc'
-```
-
-## Examples
-
-### Basic Parsing
-
-```typescript
-import { parseValue } from '@dastardly/csv';
-
-// Parse CSV with headers (default)
-const data = parseValue('name,age\nAlice,30\nBob,25');
-console.log(data.type); // 'Array'
-console.log(data.elements[0].type); // 'Object'
-console.log(data.elements[0].properties[0].key.value); // 'name'
-console.log(data.elements[0].properties[0].value.value); // 'Alice'
-```
-
-### Parsing Without Headers
-
-```typescript
-import { CSVParser } from '@dastardly/csv';
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
-import CSV_LANGUAGE from '@dastardly/tree-sitter-csv';
-
-const runtime = new NodeTreeSitterRuntime();
-const parser = new CSVParser(runtime, CSV_LANGUAGE.csv, {
-  headers: false
-});
-
-const doc = parser.parse('Alice,30\nBob,25');
-// Result: [['Alice', '30'], ['Bob', '25']]
-console.log(doc.body.elements[0].type); // 'Array'
-console.log(doc.body.elements[0].elements[0].value); // 'Alice'
-```
+## Common Patterns
 
 ### Type Inference
 
 ```typescript
-import { CSVParser } from '@dastardly/csv';
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
-import CSV_LANGUAGE from '@dastardly/tree-sitter-csv';
-
-const runtime = new NodeTreeSitterRuntime();
-const parser = new CSVParser(runtime, CSV_LANGUAGE.csv, {
-  headers: true,
-  inferTypes: true
-});
-
-const doc = parser.parse('name,age,active\nAlice,30,true\nBob,25,false');
-// Types are automatically inferred:
-// [
-//   { name: 'Alice', age: 30, active: true },
-//   { name: 'Bob', age: 25, active: false }
-// ]
-
-const firstPerson = doc.body.elements[0];
-console.log(firstPerson.properties[1].value.type); // 'Number' (not 'String')
-console.log(firstPerson.properties[2].value.type); // 'Boolean' (not 'String')
-```
-
-### Position Tracking
-
-```typescript
 import { parse } from '@dastardly/csv';
 
-const source = 'name,age\nAlice,30';
-const doc = parse(source);
+const doc = parse('name,age,active\nAlice,30,true', { inferTypes: true });
 
-// Access position information
-const array = doc.body;
-console.log(array.loc.start.line); // 1
-console.log(array.loc.start.column); // 0
-
-// First object position
-const obj = array.elements[0];
-console.log(obj.loc.start.line); // 2
-console.log(obj.loc.start.column); // 0
-```
-
-### Handling Quoted Fields
-
-```typescript
-import { parse } from '@dastardly/csv';
-
-// Quoted fields with commas
-const data1 = parse('text\n"Hello, world"');
-console.log(data1.body.elements[0].properties[0].value.value); // 'Hello, world'
-
-// Escaped quotes
-const data2 = parse('text\n"She said ""hello"""');
-console.log(data2.body.elements[0].properties[0].value.value); // 'She said "hello"'
-
-// Multiline quoted fields
-const data3 = parse('text\n"Line 1\nLine 2"');
-console.log(data3.body.elements[0].properties[0].value.value); // 'Line 1\nLine 2'
-```
-
-### TSV (Tab-Separated Values)
-
-```typescript
-import { CSVParser, serialize } from '@dastardly/csv';
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
-import CSV_LANGUAGE from '@dastardly/tree-sitter-csv';
-
-const runtime = new NodeTreeSitterRuntime();
-const parser = new CSVParser(runtime, CSV_LANGUAGE.tsv, {
-  delimiter: '\t'
-});
-
-// Parse TSV
-const doc = parser.parse('name\tage\nAlice\t30\nBob\t25');
-
-// Serialize as TSV
-const tsv = serialize(doc.body, { delimiter: '\t' });
-console.log(tsv);
-// name	age
-// Alice	30
-// Bob	25
-```
-
-### PSV (Pipe-Separated Values)
-
-```typescript
-import { CSVParser, serialize } from '@dastardly/csv';
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
-import CSV_LANGUAGE from '@dastardly/tree-sitter-csv';
-
-const runtime = new NodeTreeSitterRuntime();
-const parser = new CSVParser(runtime, CSV_LANGUAGE.psv, {
-  delimiter: '|'
-});
-
-// Parse PSV
-const doc = parser.parse('name|age\nAlice|30\nBob|25');
-
-// Serialize as PSV
-const psv = serialize(doc.body, { delimiter: '|' });
-console.log(psv);
-// name|age
-// Alice|30
-// Bob|25
-```
-
-### Custom Serialization
-
-```typescript
-import { serialize, parseValue } from '@dastardly/csv';
-
-const ast = parseValue('name,age\nAlice,30\nBob,25');
-
-// Quote all fields
-const allQuoted = serialize(ast, { quoting: 'all' });
-// "name","age"
-// "Alice","30"
-// "Bob","25"
-
-// Quote only non-numeric
-const nonNumQuoted = serialize(ast, { quoting: 'nonnumeric' });
-// "name","age"
-// "Alice",30
-// "Bob",25
-
-// Windows line endings
-const windows = serialize(ast, { lineEnding: 'crlf' });
-// name,age\r\n
-// Alice,30\r\n
-// Bob,25
-```
-
-### Handling Nested Data
-
-```typescript
-import { serialize, objectNode, propertyNode, stringNode, arrayNode } from '@dastardly/csv';
-
-const nestedData = arrayNode([
-  objectNode([
-    propertyNode(stringNode('name'), stringNode('Alice')),
-    propertyNode(stringNode('address'), objectNode([
-      propertyNode(stringNode('city'), stringNode('NYC')),
-      propertyNode(stringNode('zip'), stringNode('10001'))
-    ]))
-  ])
-]);
-
-// Option 1: JSON stringify nested structures
-const jsonified = serialize(nestedData, { nestHandling: 'json' });
-// name,address
-// Alice,"{""city"":""NYC"",""zip"":""10001""}"
-
-// Option 2: Flatten nested objects with dot notation
-const flattened = serialize(nestedData, { nestHandling: 'flatten' });
-// name,address.city,address.zip
-// Alice,NYC,10001
-
-// Option 3: Error on nesting (default)
-try {
-  serialize(nestedData); // Throws error
-} catch (e) {
-  console.error('Cannot serialize nested object');
+const data = doc.body;
+if (data.type === 'Array' && data.elements[0]?.type === 'Object') {
+  const row = data.elements[0];
+  // age is Number, not String
+  // active is Boolean, not String
 }
 ```
 
-### Converting to Native Values
+### Headerless CSV (Array of Arrays)
 
 ```typescript
-import { parseValue } from '@dastardly/csv';
-import { toNative } from '@dastardly/core';
+import { parse, serialize } from '@dastardly/csv';
 
-const ast = parseValue('name,age\nAlice,30\nBob,25');
-const data = toNative(ast);
+// Parse without headers
+const doc = parse('Alice,30\nBob,25', { headers: false });
 
-console.log(data[0].name); // 'Alice'
-console.log(data[0].age); // '30' (string unless inferTypes was used)
-console.log(data[1].name); // 'Bob'
+// Produces array of arrays:
+// [
+//   ["Alice", "30"],
+//   ["Bob", "25"]
+// ]
+
+// Serialize array of arrays
+const output = serialize(doc, { headers: false });
+// Alice,30
+// Bob,25
 ```
 
-## Known Limitations
-
-### Empty Fields Not Supported
-
-The tree-sitter-csv grammar does not currently support empty fields:
+### Custom Headers
 
 ```typescript
-// This will fail with a parse error
-parse('a,b,c\n1,,3'); // Error: empty field in middle
+import { parse, serialize } from '@dastardly/csv';
+
+// Parse with custom headers (source has no header row)
+const doc = parse('Alice,30\nBob,25', {
+  headers: ['name', 'age']
+});
+
+// Override headers when serializing
+const output = serialize(doc, {
+  headers: ['person', 'years']
+});
+// person,years
+// Alice,30
+// Bob,25
 ```
 
-**Workaround**: Use explicit empty strings:
-```typescript
-parse('a,b,c\n1,"",3'); // Works
-```
-
-See `LIMITATIONS.md` for details and proposed fixes.
-
-### Single-Character Text Fields Not Supported
-
-The grammar requires text fields to have at least 2 characters:
+### Cross-format Conversion
 
 ```typescript
-// This will fail
-parse('a\n1\n2'); // Error: 'a' is single character
+import { parse as parseCSV, serialize as serializeCSV } from '@dastardly/csv';
+import { parse as parseJSON, serialize as serializeJSON } from '@dastardly/json';
 
-// These work (numbers, not text)
-parse('1\n2\n3'); // OK
-
-// This works (quoted)
-parse('"a"\n"1"\n"2"'); // OK
-```
-
-**Workaround**: Quote single-character fields or use longer names.
-
-See `LIMITATIONS.md` for details and proposed fixes.
-
-### Variable Field Counts Not Supported
-
-All rows must have the same number of fields:
-
-```typescript
-// This will fail
-parse('a,b\n1,2,3'); // Error: row 2 has more fields than header
-```
-
-**Workaround**: Ensure all rows have consistent field counts.
-
-See `LIMITATIONS.md` for details.
-
-## Cross-Format Conversion
-
-The AST can be converted to other formats:
-
-```typescript
-import { parseValue as parseCSV } from '@dastardly/csv';
-import { serialize as toJSON } from '@dastardly/json';
-
-const ast = parseCSV('name,age\nAlice,30\nBob,25');
-const json = toJSON(ast, { indent: 2 });
+// CSV → JSON
+const csvDoc = parseCSV('name,age\nAlice,30\nBob,25');
+const jsonOutput = serializeJSON(csvDoc, { indent: 2 });
 // [
 //   {
 //     "name": "Alice",
 //     "age": "30"
 //   },
-//   {
-//     "name": "Bob",
-//     "age": "25"
-//   }
+//   ...
 // ]
+
+// JSON → CSV
+const jsonDoc = parseJSON('[{"name":"Alice","age":30}]');
+const csvOutput = serializeCSV(jsonDoc);
+// name,age
+// Alice,30
 ```
+
+### Error Handling
+
+```typescript
+import { parse } from '@dastardly/csv';
+import { ParseError } from '@dastardly/core';
+
+try {
+  // Malformed CSV (unclosed quote)
+  const doc = parse('name,age\n"Alice,30');
+} catch (error) {
+  if (error instanceof ParseError) {
+    console.error(`Parse error at line ${error.line}, column ${error.column}`);
+  }
+}
+```
+
+## Edge Cases
+
+### Empty Fields
+
+```typescript
+import { parse } from '@dastardly/csv';
+
+// Empty fields become empty strings
+const doc = parse('name,age\nAlice,\n,30');
+// Alice has empty age, second row has empty name
+```
+
+### Special Characters
+
+```typescript
+import { parse, serialize } from '@dastardly/csv';
+
+// Fields with commas are quoted automatically
+const doc = parse('name,location\n"Alice","New York, NY"');
+
+// Quotes within fields are escaped with double quotes
+const doc2 = parse('quote\n"She said ""hello"""');
+// Value: She said "hello"
+```
+
+### Large Numbers
+
+```typescript
+import { parse } from '@dastardly/csv';
+
+// With type inference, numbers are parsed as numbers
+const doc = parse('id\n9007199254740991', { inferTypes: true });
+// Gets Number.MAX_SAFE_INTEGER
+
+// Without type inference, stays as string
+const doc2 = parse('id\n9007199254740991');
+// Gets string "9007199254740991"
+```
+
+## Limitations
+
+- **Variable field counts**: Rows with different numbers of fields are not currently supported
+- **Multi-line values**: Only supported within quoted fields
+- **Nested structures**: CSV is flat - nested objects/arrays require special handling (see serializer options)
 
 ## Related Packages
 
-- **[@dastardly/core](https://www.npmjs.com/package/@dastardly/core)** - Core AST types and utilities
-- **[@dastardly/tree-sitter-runtime](https://www.npmjs.com/package/@dastardly/tree-sitter-runtime)** - Tree-sitter runtime abstraction
-- **[@dastardly/tree-sitter-csv](https://www.npmjs.com/package/@dastardly/tree-sitter-csv)** - Tree-sitter CSV/TSV/PSV grammar
-- **[@dastardly/json](https://www.npmjs.com/package/@dastardly/json)** - JSON parser and serializer
-- **[@dastardly/yaml](https://www.npmjs.com/package/@dastardly/yaml)** - YAML parser and serializer
-
-## Testing
-
-This package has comprehensive test coverage:
-- **95 tests passing** covering all functionality
-- **4 tests skipped** for documented grammar limitations
-- **Parser tests**: 19 tests (2 skipped)
-- **Serializer tests**: 27 tests
-- **Integration tests**: 17 tests (2 skipped)
-- **Utility tests**: 34 tests
-
-Run tests:
-
-```bash
-pnpm test
-```
+- **[@dastardly/core](../core)** - Core AST types and utilities
+- **[@dastardly/json](../json)** - JSON parser and serializer
+- **[@dastardly/yaml](../yaml)** - YAML parser and serializer
 
 ## License
 

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { parse, parseValue, CSVParser, serialize } from '../src/index.js';
+import { parse, serialize } from '../src/index.js';
+import { CSVParser } from '../src/parser.js';
 import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
 import CSV_LANGUAGE from '@dastardly/tree-sitter-csv';
 
@@ -17,9 +18,9 @@ describe('Public API', () => {
     });
   });
 
-  describe('parseValue()', () => {
-    it('parses CSV and returns DataNode', () => {
-      const value = parseValue('name,age\nAlice,30');
+  describe('parse().body', () => {
+    it('returns DataNode from DocumentNode', () => {
+      const value = parse('name,age\nAlice,30').body;
       expect(value.type).toBe('Array');
     });
   });

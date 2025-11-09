@@ -543,15 +543,30 @@ All format packages must implement the `FormatPackage` interface from `@dastardl
 
 **Public API** (Required by `FormatPackage` interface):
 ```typescript
-export const formatName: FormatPackage<FormatSerializeOptions> = {
-  parse(source: string): DocumentNode;
-  parseValue(source: string): DataNode;
+// Format with both parse and serialize options (e.g., CSV)
+export const formatName: FormatPackage<FormatSerializeOptions, FormatParseOptions> = {
+  parse(source: string, options?: FormatParseOptions): DocumentNode;
   serialize(node: DocumentNode | DataNode, options?: FormatSerializeOptions): string;
 };
 
+// Format with only serialize options (e.g., JSON, YAML)
+// TParseOptions defaults to BaseParseOptions if omitted
+export const json: FormatPackage<JSONSerializeOptions> = {
+  parse(source, options): DocumentNode;  // options inferred as BaseParseOptions
+  serialize(node, options?): string;
+};
+
 // Convenience exports for destructuring
-export const { parse, parseValue, serialize } = formatName;
+export const { parse, serialize } = formatName;
+
+// Export public types
+export type { FormatSerializeOptions, FormatParseOptions };
 ```
+
+**Internal Implementation**:
+- Parser classes (e.g., `JSONParser`, `YAMLParser`, `CSVParser`) are internal implementation details
+- Utility functions (e.g., `escapeString`, `parseYAMLNumber`) are internal
+- Users interact with format packages via the exported object and convenience functions only
 
 **Serialization Options**:
 Each format defines its own options extending `BaseSerializeOptions`:
@@ -562,7 +577,16 @@ export interface FormatSerializeOptions extends BaseSerializeOptions {
 }
 ```
 
-**Do not add options to `BaseSerializeOptions` unless they apply to ALL formats.**
+**Parse Options** (optional):
+Formats that need parse-time configuration define parse options:
+```typescript
+export interface FormatParseOptions extends BaseParseOptions {
+  // Format-specific parse options
+  // e.g., inferTypes, delimiter, headers for CSV
+}
+```
+
+**Do not add options to `BaseSerializeOptions` or `BaseParseOptions` unless they apply to ALL formats.**
 
 **Type Safety**:
 - TypeScript enforces the interface at compile time
@@ -733,28 +757,28 @@ See `IMPLEMENTATION_GUIDE.md` for detailed instructions on implementing each for
 
 ### Immediate Next Steps
 
-#### CSV Integration Tests (3-5 hours) ← **Current Priority**
-Add CSV to the cross-format integration test suite:
+#### CSV Integration Tests ✅ **COMPLETED**
+CSV successfully integrated into the cross-format integration test suite.
 
-**Tasks**:
-- Add CSV fixtures to `packages/integration-tests/fixtures/csv/`
-  - Real-world examples (employee data, product catalog)
+**Completed**:
+- ✅ Added 18 CSV fixtures to `packages/integration-tests/fixtures/csv/`
+  - Real-world examples (employee data, product catalog, sales data)
   - Edge cases (empty fields, quoted fields, special characters)
-- Add CSV ↔ JSON conversion tests
-- Add CSV ↔ YAML conversion tests
-- Add CSV roundtrip tests (parse → serialize → parse fidelity)
-- Add CSV position tracking tests (validate source locations)
-- Update integration-tests README with CSV examples
+- ✅ Added CSV ↔ JSON conversion tests (23 tests)
+- ✅ Added CSV ↔ YAML conversion tests (11 tests)
+- ✅ Added CSV roundtrip tests (25 tests)
+- ✅ Added CSV position tracking tests (18 tests)
+- ✅ Extended FormatPackage interface to support parse options
+- ✅ Implemented CSVParseOptions (inferTypes, delimiter, headers)
+- ✅ All 161 integration tests passing (77 CSV-specific)
 
-**Justification**: Complete CSV work before moving to new formats. Validates that CSV can successfully convert to/from other formats and that empty field support works correctly in cross-format scenarios.
+**Results**:
+- Caught and fixed empty field handling edge cases
+- Validated CSV ↔ JSON/YAML type preservation with inferTypes option
+- Confirmed RFC 4180 compliance in roundtrip scenarios
+- Established pattern for adding future formats to integration tests
 
-**Benefits**:
-- Catches edge cases in CSV ↔ JSON/YAML conversions
-- Validates empty field handling (our new Phase 2 feature)
-- Establishes pattern for adding future formats to integration tests
-- Ensures CSV structural differences (flat vs nested) are handled correctly
-
-### Short-term Goals (After CSV Integration)
+### Short-term Goals
 
 #### TOML Support (20-25 hours)
 Implement `@dastardly/toml` package following established patterns.

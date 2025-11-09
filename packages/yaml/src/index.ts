@@ -4,23 +4,10 @@ import type { DocumentNode, DataNode, FormatPackage } from '@dastardly/core';
 import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
 import YAML_LANGUAGE from '@tree-sitter-grammars/tree-sitter-yaml';
 
-// Re-export main classes and types
-export { YAMLParser } from './parser.js';
+// Export public types
 export type { YAMLSerializeOptions } from './serializer.js';
 
-// Re-export utilities
-export {
-  escapeDoubleQuoteString,
-  unescapeDoubleQuoteString,
-  escapeSingleQuoteString,
-  unescapeSingleQuoteString,
-  parseYAMLNumber,
-  normalizeBoolean,
-  normalizeNull,
-  isPlainSafe,
-  normalizeIndent,
-} from './utils.js';
-
+// Import internal classes
 import { YAMLParser } from './parser.js';
 import { serialize as serializeNode, type YAMLSerializeOptions } from './serializer.js';
 
@@ -62,21 +49,6 @@ export const yaml: FormatPackage<YAMLSerializeOptions> = {
   },
 
   /**
-   * Parse YAML string and return just the body (DataNode).
-   * Convenience for parse(source).body
-   *
-   * Note: Only the first document is parsed in multi-document YAML files.
-   *
-   * @param source - YAML string to parse
-   * @param options - Parse options (not used for YAML)
-   * @returns DataNode AST
-   * @throws ParseError if source is invalid YAML
-   */
-  parseValue(source, options): DataNode {
-    return this.parse(source, options).body;
-  },
-
-  /**
    * Serialize a dASTardly AST node to YAML string.
    *
    * @param node - DocumentNode or DataNode to serialize
@@ -89,4 +61,4 @@ export const yaml: FormatPackage<YAMLSerializeOptions> = {
 };
 
 // Convenience exports for destructuring
-export const { parse, parseValue, serialize } = yaml;
+export const { parse, serialize } = yaml;

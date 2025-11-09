@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { parse, parseValue, JSONParser, serialize } from '../src/index.js';
+import { parse, serialize } from '../src/index.js';
+import { JSONParser } from '../src/parser.js';
 import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
 import JSON_LANGUAGE from 'tree-sitter-json';
 
@@ -16,9 +17,9 @@ describe('Public API', () => {
     });
   });
 
-  describe('parseValue()', () => {
-    it('parses JSON and returns DataNode', () => {
-      const value = parseValue('{"a": 1}');
+  describe('parse().body', () => {
+    it('returns DataNode from DocumentNode', () => {
+      const value = parse('{"a": 1}').body;
       expect(value.type).toBe('Object');
     });
   });

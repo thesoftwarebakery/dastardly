@@ -1,12 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { parse, parseValue } from '../src/index.js';
+import { parse } from '../src/index.js';
 import type { DocumentNode, DataNode, ObjectNode, ArrayNode } from '@dastardly/core';
 
 describe('YAML Parser', () => {
   describe('plain scalars', () => {
     describe('strings', () => {
       it('should parse simple string', () => {
-        const node = parseValue('hello');
+        const node = parse('hello').body;
         expect(node).toMatchObject({
           type: 'String',
           value: 'hello',
@@ -21,7 +21,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse string with spaces', () => {
-        const node = parseValue('hello world');
+        const node = parse('hello world').body;
         expect(node).toMatchObject({
           type: 'String',
           value: 'hello world',
@@ -29,7 +29,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse string with hyphens', () => {
-        const node = parseValue('hello-world');
+        const node = parse('hello-world').body;
         expect(node).toMatchObject({
           type: 'String',
           value: 'hello-world',
@@ -39,7 +39,7 @@ describe('YAML Parser', () => {
 
     describe('numbers', () => {
       it('should parse positive integer', () => {
-        const node = parseValue('123');
+        const node = parse('123').body;
         expect(node).toMatchObject({
           type: 'Number',
           value: 123,
@@ -47,7 +47,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse negative integer', () => {
-        const node = parseValue('-456');
+        const node = parse('-456').body;
         expect(node).toMatchObject({
           type: 'Number',
           value: -456,
@@ -55,7 +55,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse float', () => {
-        const node = parseValue('3.14');
+        const node = parse('3.14').body;
         expect(node).toMatchObject({
           type: 'Number',
           value: 3.14,
@@ -63,7 +63,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse exponential', () => {
-        const node = parseValue('1.23e+2');
+        const node = parse('1.23e+2').body;
         expect(node).toMatchObject({
           type: 'Number',
           value: 123,
@@ -71,7 +71,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse hexadecimal', () => {
-        const node = parseValue('0xFF');
+        const node = parse('0xFF').body;
         expect(node).toMatchObject({
           type: 'Number',
           value: 255,
@@ -79,7 +79,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse octal', () => {
-        const node = parseValue('0o77');
+        const node = parse('0o77').body;
         expect(node).toMatchObject({
           type: 'Number',
           value: 63,
@@ -87,7 +87,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse binary', () => {
-        const node = parseValue('0b1010');
+        const node = parse('0b1010').body;
         expect(node).toMatchObject({
           type: 'Number',
           value: 10,
@@ -95,7 +95,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse positive infinity', () => {
-        const node = parseValue('.inf');
+        const node = parse('.inf').body;
         expect(node).toMatchObject({
           type: 'Number',
           value: Infinity,
@@ -103,7 +103,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse negative infinity', () => {
-        const node = parseValue('-.inf');
+        const node = parse('-.inf').body;
         expect(node).toMatchObject({
           type: 'Number',
           value: -Infinity,
@@ -111,7 +111,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse NaN', () => {
-        const node = parseValue('.nan');
+        const node = parse('.nan').body;
         expect(node.type).toBe('Number');
         expect((node as any).value).toBeNaN();
       });
@@ -119,7 +119,7 @@ describe('YAML Parser', () => {
 
     describe('booleans', () => {
       it('should parse true', () => {
-        const node = parseValue('true');
+        const node = parse('true').body;
         expect(node).toMatchObject({
           type: 'Boolean',
           value: true,
@@ -127,7 +127,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse false', () => {
-        const node = parseValue('false');
+        const node = parse('false').body;
         expect(node).toMatchObject({
           type: 'Boolean',
           value: false,
@@ -135,7 +135,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse yes as true', () => {
-        const node = parseValue('yes');
+        const node = parse('yes').body;
         expect(node).toMatchObject({
           type: 'Boolean',
           value: true,
@@ -143,7 +143,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse no as false', () => {
-        const node = parseValue('no');
+        const node = parse('no').body;
         expect(node).toMatchObject({
           type: 'Boolean',
           value: false,
@@ -151,7 +151,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse on as true', () => {
-        const node = parseValue('on');
+        const node = parse('on').body;
         expect(node).toMatchObject({
           type: 'Boolean',
           value: true,
@@ -159,7 +159,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse off as false', () => {
-        const node = parseValue('off');
+        const node = parse('off').body;
         expect(node).toMatchObject({
           type: 'Boolean',
           value: false,
@@ -169,7 +169,7 @@ describe('YAML Parser', () => {
 
     describe('null', () => {
       it('should parse null', () => {
-        const node = parseValue('null');
+        const node = parse('null').body;
         expect(node).toMatchObject({
           type: 'Null',
           value: null,
@@ -177,7 +177,7 @@ describe('YAML Parser', () => {
       });
 
       it('should parse tilde as null', () => {
-        const node = parseValue('~');
+        const node = parse('~').body;
         expect(node).toMatchObject({
           type: 'Null',
           value: null,
@@ -202,7 +202,7 @@ describe('YAML Parser', () => {
   describe('quoted scalars', () => {
     describe('double-quoted', () => {
       it('should parse double-quoted string', () => {
-        const node = parseValue('"hello"');
+        const node = parse('"hello"').body;
         expect(node).toMatchObject({
           type: 'String',
           value: 'hello',
@@ -210,7 +210,7 @@ describe('YAML Parser', () => {
       });
 
       it('should unescape newline', () => {
-        const node = parseValue('"line1\\nline2"');
+        const node = parse('"line1\\nline2"').body;
         expect(node).toMatchObject({
           type: 'String',
           value: 'line1\nline2',
@@ -218,7 +218,7 @@ describe('YAML Parser', () => {
       });
 
       it('should unescape tab', () => {
-        const node = parseValue('"hello\\tworld"');
+        const node = parse('"hello\\tworld"').body;
         expect(node).toMatchObject({
           type: 'String',
           value: 'hello\tworld',
@@ -226,7 +226,7 @@ describe('YAML Parser', () => {
       });
 
       it('should unescape unicode', () => {
-        const node = parseValue('"\\u0048\\u0065\\u006c\\u006c\\u006f"');
+        const node = parse('"\\u0048\\u0065\\u006c\\u006c\\u006f"').body;
         expect(node).toMatchObject({
           type: 'String',
           value: 'Hello',
@@ -236,7 +236,7 @@ describe('YAML Parser', () => {
 
     describe('single-quoted', () => {
       it('should parse single-quoted string', () => {
-        const node = parseValue("'hello'");
+        const node = parse("'hello'").body;
         expect(node).toMatchObject({
           type: 'String',
           value: 'hello',
@@ -244,7 +244,7 @@ describe('YAML Parser', () => {
       });
 
       it('should handle escaped single quote', () => {
-        const node = parseValue("'can''t'");
+        const node = parse("'can''t'").body;
         expect(node).toMatchObject({
           type: 'String',
           value: "can't",
@@ -252,7 +252,7 @@ describe('YAML Parser', () => {
       });
 
       it('should preserve double quotes', () => {
-        const node = parseValue("'say \"hello\"'");
+        const node = parse("'say \"hello\"'").body;
         expect(node).toMatchObject({
           type: 'String',
           value: 'say "hello"',
@@ -263,7 +263,7 @@ describe('YAML Parser', () => {
 
   describe('block mapping (objects)', () => {
     it('should parse simple object', () => {
-      const node = parseValue('name: Alice\nage: 30');
+      const node = parse('name: Alice\nage: 30').body;
       expect(node).toMatchObject({
         type: 'Object',
         properties: [
@@ -281,7 +281,7 @@ describe('YAML Parser', () => {
     });
 
     it('should parse nested object', () => {
-      const node = parseValue('person:\n  name: Alice\n  age: 30');
+      const node = parse('person:\n  name: Alice\n  age: 30').body;
       expect(node).toMatchObject({
         type: 'Object',
         properties: [
@@ -308,7 +308,7 @@ describe('YAML Parser', () => {
     });
 
     it('should parse empty object', () => {
-      const node = parseValue('{}');
+      const node = parse('{}').body;
       expect(node).toMatchObject({
         type: 'Object',
         properties: [],
@@ -318,7 +318,7 @@ describe('YAML Parser', () => {
 
   describe('block sequence (arrays)', () => {
     it('should parse simple array', () => {
-      const node = parseValue('- one\n- two\n- three');
+      const node = parse('- one\n- two\n- three').body;
       expect(node).toMatchObject({
         type: 'Array',
         elements: [
@@ -331,7 +331,7 @@ describe('YAML Parser', () => {
     });
 
     it('should parse nested array', () => {
-      const node = parseValue('- - one\n  - two\n- - three\n  - four');
+      const node = parse('- - one\n  - two\n- - three\n  - four').body;
       expect(node).toMatchObject({
         type: 'Array',
         elements: [
@@ -351,7 +351,7 @@ describe('YAML Parser', () => {
     });
 
     it('should parse empty array', () => {
-      const node = parseValue('[]');
+      const node = parse('[]').body;
       expect(node).toMatchObject({
         type: 'Array',
         elements: [],
@@ -361,7 +361,7 @@ describe('YAML Parser', () => {
 
   describe('flow style (inline)', () => {
     it('should parse flow mapping', () => {
-      const node = parseValue('{name: Alice, age: 30}');
+      const node = parse('{name: Alice, age: 30}').body;
       expect(node).toMatchObject({
         type: 'Object',
         properties: [
@@ -379,7 +379,7 @@ describe('YAML Parser', () => {
     });
 
     it('should parse flow sequence', () => {
-      const node = parseValue('[1, 2, 3]');
+      const node = parse('[1, 2, 3]').body;
       expect(node).toMatchObject({
         type: 'Array',
         elements: [
@@ -392,7 +392,7 @@ describe('YAML Parser', () => {
     });
 
     it('should parse nested flow structures', () => {
-      const node = parseValue('{items: [1, 2, 3], count: 3}');
+      const node = parse('{items: [1, 2, 3], count: 3}').body;
       expect(node).toMatchObject({
         type: 'Object',
         properties: [
@@ -415,7 +415,7 @@ describe('YAML Parser', () => {
 
   describe('mixed structures', () => {
     it('should parse array of objects', () => {
-      const node = parseValue('- name: Alice\n  age: 30\n- name: Bob\n  age: 25');
+      const node = parse('- name: Alice\n  age: 30\n- name: Bob\n  age: 25').body;
       expect(node).toMatchObject({
         type: 'Array',
         elements: [
@@ -435,7 +435,7 @@ describe('YAML Parser', () => {
     });
 
     it('should parse object with arrays', () => {
-      const node = parseValue('users:\n  - Alice\n  - Bob\ncount: 2');
+      const node = parse('users:\n  - Alice\n  - Bob\ncount: 2').body;
       expect(node).toMatchObject({
         type: 'Object',
         properties: [
@@ -467,8 +467,8 @@ describe('YAML Parser', () => {
       });
     });
 
-    it('should return DataNode from parseValue()', () => {
-      const node = parseValue('hello: world');
+    it('should return DataNode from parse().body', () => {
+      const node = parse('hello: world').body;
       expect(node).toMatchObject({
         type: 'Object',
       });
@@ -477,7 +477,7 @@ describe('YAML Parser', () => {
 
   describe('position tracking', () => {
     it('should track position for scalars', () => {
-      const node = parseValue('hello');
+      const node = parse('hello').body;
       expect(node.loc).toBeDefined();
       expect(node.loc.start.line).toBeGreaterThan(0);
       expect(node.loc.start.column).toBeGreaterThanOrEqual(0);
@@ -488,7 +488,7 @@ describe('YAML Parser', () => {
     });
 
     it('should track position for objects', () => {
-      const node = parseValue('name: Alice') as ObjectNode;
+      const node = parse('name: Alice').body as ObjectNode;
       expect(node.loc).toBeDefined();
       expect(node.properties[0]?.loc).toBeDefined();
       expect(node.properties[0]?.key.loc).toBeDefined();
@@ -496,7 +496,7 @@ describe('YAML Parser', () => {
     });
 
     it('should track position for arrays', () => {
-      const node = parseValue('- one\n- two') as ArrayNode;
+      const node = parse('- one\n- two').body as ArrayNode;
       expect(node.loc).toBeDefined();
       expect(node.elements[0]?.loc).toBeDefined();
       expect(node.elements[1]?.loc).toBeDefined();
@@ -507,7 +507,7 @@ describe('YAML Parser', () => {
     describe('literal (|)', () => {
       it('should parse literal block scalar', () => {
         const yaml = 'text: |\n  Line 1\n  Line 2\n';
-        const node = parseValue(yaml) as ObjectNode;
+        const node = parse(yaml).body as ObjectNode;
         expect(node.properties[0]?.value).toMatchObject({
           type: 'String',
           value: 'Line 1\nLine 2\n',
@@ -516,7 +516,7 @@ describe('YAML Parser', () => {
 
       it('should parse literal with strip indicator (|-)', () => {
         const yaml = 'text: |-\n  Line 1\n  Line 2\n';
-        const node = parseValue(yaml) as ObjectNode;
+        const node = parse(yaml).body as ObjectNode;
         expect(node.properties[0]?.value).toMatchObject({
           type: 'String',
           value: 'Line 1\nLine 2',
@@ -525,7 +525,7 @@ describe('YAML Parser', () => {
 
       it('should parse literal with keep indicator (|+)', () => {
         const yaml = 'text: |+\n  Line 1\n  Line 2\n\n\n';
-        const node = parseValue(yaml) as ObjectNode;
+        const node = parse(yaml).body as ObjectNode;
         expect(node.properties[0]?.value).toMatchObject({
           type: 'String',
           value: 'Line 1\nLine 2\n\n\n',
@@ -536,7 +536,7 @@ describe('YAML Parser', () => {
     describe('folded (>)', () => {
       it('should parse folded block scalar', () => {
         const yaml = 'text: >\n  Long line\n  continues here\n';
-        const node = parseValue(yaml) as ObjectNode;
+        const node = parse(yaml).body as ObjectNode;
         expect(node.properties[0]?.value).toMatchObject({
           type: 'String',
           value: 'Long line continues here\n',
@@ -545,7 +545,7 @@ describe('YAML Parser', () => {
 
       it('should parse folded with strip indicator (>-)', () => {
         const yaml = 'text: >-\n  Long line\n  continues here\n';
-        const node = parseValue(yaml) as ObjectNode;
+        const node = parse(yaml).body as ObjectNode;
         expect(node.properties[0]?.value).toMatchObject({
           type: 'String',
           value: 'Long line continues here',
@@ -557,7 +557,7 @@ describe('YAML Parser', () => {
   describe('anchors and aliases', () => {
     it('should resolve simple anchor reference', () => {
       const yaml = 'defaults: &defaults\n  key: value\nprod: *defaults';
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
       expect(node.properties).toHaveLength(2);
 
       const defaults = node.properties[0]?.value as ObjectNode;
@@ -586,7 +586,7 @@ describe('YAML Parser', () => {
 
     it('should resolve scalar anchor reference', () => {
       const yaml = 'name: &name Alice\nuser: *name';
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
       expect(node.properties[0]?.value).toMatchObject({
         type: 'String',
         value: 'Alice',
@@ -599,7 +599,7 @@ describe('YAML Parser', () => {
 
     it('should resolve nested anchor reference', () => {
       const yaml = 'root: &root\n  child:\n    value: 42\nref: *root';
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
 
       const root = node.properties[0]?.value;
       const ref = node.properties[1]?.value;
@@ -614,7 +614,7 @@ describe('YAML Parser', () => {
 
     it('should handle multiple aliases to same anchor', () => {
       const yaml = 'template: &t\n  x: 1\na: *t\nb: *t\nc: *t';
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
       expect(node.properties).toHaveLength(4);
 
       // All references should be objects with the same structure
@@ -626,24 +626,24 @@ describe('YAML Parser', () => {
 
     it('should throw on circular reference', () => {
       const yaml = 'a: &a\n  b: *a';
-      expect(() => parseValue(yaml)).toThrow(/circular/i);
+      expect(() => parse(yaml).body).toThrow(/circular/i);
     });
 
     it('should throw on forward reference (alias before anchor)', () => {
       const yaml = 'prod: *defaults\ndefaults: &defaults\n  key: value';
-      expect(() => parseValue(yaml)).toThrow(/undefined.*anchor/i);
+      expect(() => parse(yaml).body).toThrow(/undefined.*anchor/i);
     });
 
     it('should throw on undefined anchor reference', () => {
       const yaml = 'prod: *nonexistent';
-      expect(() => parseValue(yaml)).toThrow(/undefined.*anchor/i);
+      expect(() => parse(yaml).body).toThrow(/undefined.*anchor/i);
     });
   });
 
   describe('merge keys', () => {
     it('should merge simple anchor', () => {
       const yaml = 'defaults: &defaults\n  a: 1\n  b: 2\nconfig:\n  <<: *defaults\n  c: 3';
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
 
       const config = node.properties[1]?.value as ObjectNode;
       expect(config).toMatchObject({
@@ -657,7 +657,7 @@ describe('YAML Parser', () => {
 
     it('should allow explicit keys to override merged keys', () => {
       const yaml = 'defaults: &defaults\n  a: 1\n  b: 2\nconfig:\n  a: 99\n  <<: *defaults';
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
 
       const config = node.properties[1]?.value as ObjectNode;
       // Explicit key 'a: 99' should override merged 'a: 1'
@@ -667,7 +667,7 @@ describe('YAML Parser', () => {
 
     it('should merge multiple anchors', () => {
       const yaml = 'd1: &d1\n  a: 1\nd2: &d2\n  b: 2\nconfig:\n  <<: [*d1, *d2]\n  c: 3';
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
 
       const config = node.properties[2]?.value as ObjectNode;
       expect(config.properties.find(p => p.key.value === 'a')?.value).toMatchObject({ value: 1 });
@@ -679,7 +679,7 @@ describe('YAML Parser', () => {
   describe('tags', () => {
     it('should handle !!str tag to force string', () => {
       const yaml = 'age: !!str 25';
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
 
       const ageProp = node.properties[0]?.value;
       expect(ageProp).toMatchObject({
@@ -690,7 +690,7 @@ describe('YAML Parser', () => {
 
     it('should handle !!int tag to force integer', () => {
       const yaml = 'count: !!int "123"';
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
 
       const countProp = node.properties[0]?.value;
       expect(countProp).toMatchObject({
@@ -701,7 +701,7 @@ describe('YAML Parser', () => {
 
     it('should ignore custom tags and parse underlying structure', () => {
       const yaml = 'custom: !MyType\n  data: value';
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
 
       const customProp = node.properties[0]?.value;
       expect(customProp).toMatchObject({
@@ -713,7 +713,7 @@ describe('YAML Parser', () => {
   describe('multi-document', () => {
     it('should parse first document by default', () => {
       const yaml = '---\nfirst: 1\n---\nsecond: 2';
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
 
       expect(node).toMatchObject({
         type: 'Object',
@@ -724,7 +724,7 @@ describe('YAML Parser', () => {
 
     it('should parse document without leading ---', () => {
       const yaml = 'simple: value';
-      const node = parseValue(yaml);
+      const node = parse(yaml).body;
       expect(node).toMatchObject({
         type: 'Object',
       });
@@ -732,7 +732,7 @@ describe('YAML Parser', () => {
 
     it('should handle document end marker ...', () => {
       const yaml = 'first: 1\n...';
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
 
       expect(node).toMatchObject({
         type: 'Object',
@@ -754,7 +754,7 @@ services:
     <<: *common
     image: node`;
 
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
       expect(node).toMatchObject({
         type: 'Object',
       });
@@ -781,7 +781,7 @@ jobs:
       - uses: actions/checkout@v2
       - run: npm test`;
 
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
       expect(node).toMatchObject({
         type: 'Object',
       });
@@ -807,7 +807,7 @@ spec:
     ports:
     - containerPort: 80`;
 
-      const node = parseValue(yaml) as ObjectNode;
+      const node = parse(yaml).body as ObjectNode;
       expect(node).toMatchObject({
         type: 'Object',
       });
@@ -822,11 +822,11 @@ spec:
 
   describe('error handling', () => {
     it('should throw on invalid YAML', () => {
-      expect(() => parse('{')).toThrow();
+      expect(() => parse('{').body).toThrow();
     });
 
     it('should throw on unterminated string', () => {
-      expect(() => parse('"unterminated')).toThrow();
+      expect(() => parse('"unterminated').body).toThrow();
     });
 
     it('should provide error location', () => {
@@ -840,12 +840,12 @@ spec:
 
     it('should throw on complex keys (objects as keys)', () => {
       const yaml = '? {key1: value1}\n: mapped_value';
-      expect(() => parseValue(yaml)).toThrow(/complex.*key/i);
+      expect(() => parse(yaml).body).toThrow(/complex.*key/i);
     });
 
     it('should throw on complex keys (arrays as keys)', () => {
       const yaml = '? [item1, item2]\n: mapped_value';
-      expect(() => parseValue(yaml)).toThrow(/complex.*key/i);
+      expect(() => parse(yaml).body).toThrow(/complex.*key/i);
     });
   });
 

@@ -5,21 +5,11 @@ import { isDocumentNode } from '@dastardly/core';
 import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
 import CSV_LANGUAGE from '@dastardly/tree-sitter-csv';
 
-// Re-export main classes and types
-export { CSVParser } from './parser.js';
+// Export public types
 export type { CSVParseOptions } from './parser.js';
 export type { CSVSerializeOptions } from './serializer.js';
 
-// Re-export utilities
-export {
-  escapeField,
-  unescapeField,
-  needsQuoting,
-  parseCSVNumber,
-  normalizeLineEnding,
-  type QuoteStrategy,
-} from './utils.js';
-
+// Import internal classes
 import { CSVParser, type CSVParseOptions } from './parser.js';
 import { serialize as serializeNode, type CSVSerializeOptions } from './serializer.js';
 
@@ -63,19 +53,6 @@ export const csv: FormatPackage<CSVSerializeOptions, CSVParseOptions> = {
   },
 
   /**
-   * Parse CSV string and return just the body (DataNode).
-   * Convenience for parse(source, options).body
-   *
-   * @param source - CSV string to parse
-   * @param options - CSV parse options (delimiter, headers, inferTypes)
-   * @returns DataNode AST (Array of Objects or Array of Arrays)
-   * @throws ParseError if source is invalid CSV
-   */
-  parseValue(source, options): DataNode {
-    return this.parse(source, options).body;
-  },
-
-  /**
    * Serialize a dASTardly AST node to CSV string.
    *
    * Accepts either DocumentNode or DataNode. If a DataNode is provided,
@@ -94,4 +71,4 @@ export const csv: FormatPackage<CSVSerializeOptions, CSVParseOptions> = {
 };
 
 // Convenience exports for destructuring
-export const { parse, parseValue, serialize } = csv;
+export const { parse, serialize } = csv;
