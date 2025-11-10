@@ -25,6 +25,12 @@ import {
   createMaxPropertiesValidator,
 } from './validators/object.js';
 import { createEnumValidator, createConstValidator } from './validators/basic.js';
+import {
+  createAllOfValidator,
+  createAnyOfValidator,
+  createOneOfValidator,
+  createNotValidator,
+} from './validators/combinators.js';
 
 /**
  * Schema compiler
@@ -123,10 +129,23 @@ export class SchemaCompiler {
       validators.push(createMaxPropertiesValidator(schema.maxProperties));
     }
 
+    // Combinator validators
+    if (schema.allOf !== undefined) {
+      validators.push(createAllOfValidator(schema.allOf, this));
+    }
+    if (schema.anyOf !== undefined) {
+      validators.push(createAnyOfValidator(schema.anyOf, this));
+    }
+    if (schema.oneOf !== undefined) {
+      validators.push(createOneOfValidator(schema.oneOf, this));
+    }
+    if (schema.not !== undefined) {
+      validators.push(createNotValidator(schema.not, this));
+    }
+
     // TODO: Add more keyword validators
     // - Object validators (properties, additionalProperties)
     // - items (array item schema)
-    // - Combinators (allOf, anyOf, oneOf, not)
     // - Conditional (if/then/else)
     // - $ref
 
