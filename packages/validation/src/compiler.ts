@@ -3,6 +3,20 @@
 import type { JSONSchema7 } from 'json-schema';
 import type { CompiledSchema, KeywordValidator } from './compiler-types.js';
 import { createTypeValidator } from './validators/type.js';
+import {
+  createMinLengthValidator,
+  createMaxLengthValidator,
+  createPatternValidator,
+} from './validators/string.js';
+import {
+  createMinimumValidator,
+  createMaximumValidator,
+  createMultipleOfValidator,
+} from './validators/number.js';
+import {
+  createMinItemsValidator,
+  createMaxItemsValidator,
+} from './validators/array.js';
 
 /**
  * Schema compiler
@@ -46,11 +60,39 @@ export class SchemaCompiler {
       validators.push(createTypeValidator(schema.type));
     }
 
+    // String validators
+    if (schema.minLength !== undefined) {
+      validators.push(createMinLengthValidator(schema.minLength));
+    }
+    if (schema.maxLength !== undefined) {
+      validators.push(createMaxLengthValidator(schema.maxLength));
+    }
+    if (schema.pattern !== undefined) {
+      validators.push(createPatternValidator(schema.pattern));
+    }
+
+    // Number validators
+    if (schema.minimum !== undefined) {
+      validators.push(createMinimumValidator(schema.minimum));
+    }
+    if (schema.maximum !== undefined) {
+      validators.push(createMaximumValidator(schema.maximum));
+    }
+    if (schema.multipleOf !== undefined) {
+      validators.push(createMultipleOfValidator(schema.multipleOf));
+    }
+
+    // Array validators
+    if (schema.minItems !== undefined) {
+      validators.push(createMinItemsValidator(schema.minItems));
+    }
+    if (schema.maxItems !== undefined) {
+      validators.push(createMaxItemsValidator(schema.maxItems));
+    }
+
     // TODO: Add more keyword validators
-    // - String validators (minLength, maxLength, pattern)
-    // - Number validators (minimum, maximum, multipleOf)
     // - Object validators (properties, required, additionalProperties)
-    // - Array validators (items, minItems, maxItems)
+    // - items (array item schema)
     // - Combinators (allOf, anyOf, oneOf, not)
     // - Conditional (if/then/else)
     // - Enum/const
