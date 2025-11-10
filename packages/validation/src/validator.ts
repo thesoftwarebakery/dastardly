@@ -51,7 +51,7 @@ export class Validator {
    */
   constructor(schema: JSONSchema7, options: ValidatorOptions = {}) {
     this.compiler = new SchemaCompiler();
-    this.compiled = this.compiler.compile(schema);
+    this.compiled = this.compiler.compile(schema, true); // true = isRoot for $ref resolution
     this.cache = options.cache !== false ? new ValidationCache(options.cacheSize) : null;
     this.failFast = options.failFast ?? false;
   }

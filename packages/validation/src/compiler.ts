@@ -37,6 +37,7 @@ import {
   createNotValidator,
 } from './validators/combinators.js';
 import { createBooleanSchemaValidator } from './validators/boolean-schema.js';
+import { createRefValidator } from './validators/ref.js';
 
 /**
  * Schema compiler
@@ -46,14 +47,21 @@ import { createBooleanSchemaValidator } from './validators/boolean-schema.js';
  */
 export class SchemaCompiler {
   private readonly cache = new Map<JSONSchema7, CompiledSchema>();
+  private rootSchema: JSONSchema7 | null = null;
 
   /**
    * Compile a JSON schema to optimized validators
    *
    * @param schema - JSON Schema to compile (can be boolean or object)
+   * @param isRoot - Whether this is the root schema (for $ref resolution)
    * @returns Compiled schema with validators
    */
-  compile(schema: JSONSchema7 | boolean): CompiledSchema {
+  compile(schema: JSONSchema7 | boolean, isRoot = false): CompiledSchema {
+    // Store root schema for $ref resolution
+    if (isRoot && typeof schema === 'object') {
+      this.rootSchema = schema;
+    }
+
     // Handle boolean schemas
     if (typeof schema === 'boolean') {
       return {
@@ -82,6 +90,20 @@ export class SchemaCompiler {
    */
   private compileSchema(schema: JSONSchema7): CompiledSchema {
     const validators: KeywordValidator[] = [];
+
+    // Handle $ref - per JSON Schema spec, $ref overrides all sibling keywords
+    if (schema.$ref !== undefined) {
+      if (this.rootSchema === null) {
+        throw new Error('Cannot resolve $ref: root schema not set');
+      }
+      validators.push(createRefValidator(schema.$ref, this.rootSchema, this));
+
+      // When $ref is present, ignore all other keywords and return early
+      return {
+        validators,
+        schema,
+      };
+    }
 
     // Type validation
     if (schema.type !== undefined) {
