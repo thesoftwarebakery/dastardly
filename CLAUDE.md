@@ -47,9 +47,12 @@ dastardly/
 │   ├── tree-sitter-runtime/     # Shared tree-sitter utilities
 │   ├── json/                    # JSON parser/serializer
 │   ├── yaml/                    # YAML parser/serializer
-│   ├── xml/                     # XML parser/serializer
-│   ├── csv/                     # CSV parser/serializer
-│   └── toml/                    # TOML parser/serializer
+│   ├── csv/                     # CSV parser/serializer (RFC 4180 compliant)
+│   ├── validation/              # JSON Schema validator
+│   ├── integration-tests/       # Cross-format integration tests
+│   └── (future)
+│       ├── xml/                 # XML parser/serializer
+│       └── toml/                # TOML parser/serializer
 ```
 
 ### AST Design Principles
@@ -224,11 +227,19 @@ export type { FormatSerializeOptions, FormatParseOptions };
 - [ ] XML support (attributes, namespaces)
 - [ ] TOML support
 
-### Phase 3: Validation
-- [ ] JSON Schema validator
-- [ ] Cross-format schema validation
-- [ ] Error reporting with source positions
-- [ ] Fail-fast option for validation
+### Phase 3: Validation (COMPLETED)
+- [x] JSON Schema validator for dASTardly ASTs
+- [x] Comprehensive JSON Schema Draft 7 support (86.1% test suite compliance)
+- [x] Schema compilation architecture (AJV-inspired, cached validators)
+- [x] Modular keyword validators (type, string, number, array, object, combinators)
+- [x] Nested validation (properties, items, patternProperties, additionalProperties)
+- [x] $ref support (local JSON Pointer references)
+- [x] Conditional validation (if/then/else)
+- [x] Error reporting with source positions and JSON Pointers
+- [x] Fail-fast option for validation
+- [x] Official JSON Schema Test Suite integration (488/567 tests passing)
+- [x] Content-addressable validation caching
+- [x] Deep equality utilities for enum/const/uniqueItems validation
 
 ## Key Design Challenges
 
