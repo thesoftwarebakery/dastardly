@@ -54,6 +54,6 @@ export interface CompiledSchema {
   /** Validators for this schema (in order) */
   readonly validators: ReadonlyArray<KeywordValidator>;
 
-  /** Original schema (for debugging) */
-  readonly schema: JSONSchema7;
+  /** Original schema (for debugging) - can be boolean or object */
+  readonly schema: JSONSchema7 | boolean;
 }

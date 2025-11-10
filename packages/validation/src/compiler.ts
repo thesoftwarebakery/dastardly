@@ -18,11 +18,16 @@ import {
 import {
   createMinItemsValidator,
   createMaxItemsValidator,
+  createItemsValidator,
+  createAdditionalItemsValidator,
 } from './validators/array.js';
 import {
   createRequiredValidator,
   createMinPropertiesValidator,
   createMaxPropertiesValidator,
+  createPropertiesValidator,
+  createPatternPropertiesValidator,
+  createAdditionalPropertiesValidator,
 } from './validators/object.js';
 import { createEnumValidator, createConstValidator } from './validators/basic.js';
 import {
@@ -31,6 +36,7 @@ import {
   createOneOfValidator,
   createNotValidator,
 } from './validators/combinators.js';
+import { createBooleanSchemaValidator } from './validators/boolean-schema.js';
 
 /**
  * Schema compiler
@@ -44,10 +50,18 @@ export class SchemaCompiler {
   /**
    * Compile a JSON schema to optimized validators
    *
-   * @param schema - JSON Schema to compile
+   * @param schema - JSON Schema to compile (can be boolean or object)
    * @returns Compiled schema with validators
    */
-  compile(schema: JSONSchema7): CompiledSchema {
+  compile(schema: JSONSchema7 | boolean): CompiledSchema {
+    // Handle boolean schemas
+    if (typeof schema === 'boolean') {
+      return {
+        validators: [createBooleanSchemaValidator(schema)],
+        schema,
+      };
+    }
+
     // Check cache first (by schema reference)
     const cached = this.cache.get(schema);
     if (cached) {
@@ -117,6 +131,13 @@ export class SchemaCompiler {
     if (schema.maxItems !== undefined) {
       validators.push(createMaxItemsValidator(schema.maxItems));
     }
+    // items must come before additionalItems
+    if (schema.items !== undefined) {
+      validators.push(createItemsValidator(schema.items, this));
+    }
+    if (schema.additionalItems !== undefined) {
+      validators.push(createAdditionalItemsValidator(schema.additionalItems, schema.items, this));
+    }
 
     // Object validators
     if (schema.required !== undefined) {
@@ -127,6 +148,23 @@ export class SchemaCompiler {
     }
     if (schema.maxProperties !== undefined) {
       validators.push(createMaxPropertiesValidator(schema.maxProperties));
+    }
+    // properties and patternProperties must come before additionalProperties
+    if (schema.properties !== undefined) {
+      validators.push(createPropertiesValidator(schema.properties, this));
+    }
+    if (schema.patternProperties !== undefined) {
+      validators.push(createPatternPropertiesValidator(schema.patternProperties, this));
+    }
+    if (schema.additionalProperties !== undefined) {
+      validators.push(
+        createAdditionalPropertiesValidator(
+          schema.additionalProperties,
+          schema.properties,
+          schema.patternProperties,
+          this
+        )
+      );
     }
 
     // Combinator validators
@@ -144,9 +182,9 @@ export class SchemaCompiler {
     }
 
     // TODO: Add more keyword validators
-    // - Object validators (properties, additionalProperties)
-    // - items (array item schema)
     // - Conditional (if/then/else)
+    // - contains, uniqueItems
+    // - dependencies, propertyNames
     // - $ref
 
     return {
