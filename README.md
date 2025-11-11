@@ -2,20 +2,12 @@
 
 A high-performance data format parser and serializer that uses a common AST (Abstract Syntax Tree) to enable cross-format conversion and validation. Built with Tree-sitter for real-time editor performance.
 
-## Project Status
-
-- **Formats Completed**: 4/6 (JSON, YAML, CSV, core infrastructure)
-- **Tests Passing**: 802 across all packages
-- **Current Phase**: Ready for additional formats (XML, TOML)
-- **Next Step**: XML or TOML implementation
-
 ## Supported Formats
 
-- ✅ **JSON** - Full support with position tracking (113 tests)
-- ✅ **YAML** - Anchors, aliases, tags, merge keys, block scalars (267 tests)
-- ✅ **CSV/TSV/PSV** - RFC 4180 compliant, empty field support via external scanner (98 tests)
-- ⏳ **XML** - Planned (attributes, namespaces, CDATA)
-- ⏳ **TOML** - Planned (tables, dotted keys, datetime types)
+- ✅ **JSON** - Full support with position tracking
+- ✅ **YAML** - Anchors, aliases, tags, merge keys, block scalars
+- ✅ **CSV/TSV/PSV** - RFC 4180 compliant with external scanner
+- ✅ **Validation** - JSON Schema Draft 7 support
 
 ## Features
 
@@ -58,14 +50,7 @@ pnpm -r test
 
 ### Test Coverage
 
-- **@dastardly/core**: 83 tests (AST types, builders, utilities)
-- **@dastardly/tree-sitter-runtime**: 36 tests (parser infrastructure)
-- **@dastardly/json**: 113 tests (JSON parsing and serialization)
-- **@dastardly/yaml**: 267 tests (YAML parsing and serialization with advanced features)
-- **@dastardly/csv**: 98 tests (CSV/TSV/PSV parsing, serialization, RFC 4180 compliance)
-- **@dastardly/integration-tests**: 99 tests (cross-format conversions, roundtrip, position tracking)
-
-**Total: 696 tests passing** (1 skipped test for CSV variable field counts)
+Comprehensive test coverage across all packages including unit tests, integration tests, and cross-format validation tests.
 
 ## Benchmarking
 

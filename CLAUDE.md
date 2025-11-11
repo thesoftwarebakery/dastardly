@@ -21,7 +21,7 @@ This project has several documentation files, each serving a specific purpose:
 - **ARCHITECTURE.md**: When making design decisions, changing core abstractions, or modifying the parser/serializer pipeline
 - **CONTRIBUTING.md**: When changing development workflow, coding standards, or adding new tools
 - **README.md**: When adding features, changing installation steps, or updating examples
-- **CLAUDE.md**: When changing project structure, adding new concepts, or updating implementation phases
+- **CLAUDE.md**: When changing project structure or adding new concepts
 - **Package README.md**: When creating new format packages or adding/changing format-specific features
 
 **IMPORTANT**: Always check if documentation needs updating after making significant code changes. Use the `/check-docs` slash command to verify documentation consistency.
@@ -50,9 +50,7 @@ dastardly/
 │   ├── csv/                     # CSV parser/serializer (RFC 4180 compliant)
 │   ├── validation/              # JSON Schema validator
 │   ├── integration-tests/       # Cross-format integration tests
-│   └── (future)
-│       ├── xml/                 # XML parser/serializer
-│       └── toml/                # TOML parser/serializer
+│   └── (see GitHub issues for planned formats)
 ```
 
 ### AST Design Principles
@@ -122,81 +120,16 @@ pnpm -r test
 pnpm --filter @dastardly/json test
 ```
 
-## Implementation Phases
+## Implementing New Format Packages
 
-### Phase 0: Foundation & Tooling (COMPLETED)
-- [x] Set up monorepo structure
-- [x] Create core AST types (initial implementation)
-- [x] Create project documentation (CLAUDE.md, ARCHITECTURE.md, CONTRIBUTING.md)
-- [x] Set up slash commands and tooling
-- [x] Review and fix core AST implementation
-- [x] Design final core AST API
-- [x] Set up testing infrastructure (Vitest)
-- [x] Document design decisions
-
-### Phase 1a: JSON Support (COMPLETED)
-- [x] Create `@dastardly/tree-sitter-runtime` package
-- [x] Implement abstract parser runtime (tree-sitter + web-tree-sitter compatibility)
-- [x] Integrate tree-sitter-json
-- [x] Implement JSON → AST parser
-- [x] Implement AST → JSON serializer
-- [x] Comprehensive tests (position tracking, edge cases, roundtrip) - 115 tests
-- [x] Handle edge cases (large numbers, unicode, etc.)
-
-### Phase 1b: YAML Support (COMPLETED)
-- [x] Integrate tree-sitter-yaml (@tree-sitter-grammars/tree-sitter-yaml)
-- [x] Implement YAML → AST parser
-- [x] Handle YAML-specific features (anchors, aliases, tags, merge keys, block scalars)
-- [x] Implement AST → YAML serializer (flow and block styles)
-- [x] Comprehensive tests (utils, parser, serializer) - 245 tests total
-- [x] Document YAML-specific behavior (anchor resolution, complex keys, multi-document)
-
-### Phase 1c: Integration Testing (COMPLETED)
-- [x] Create `@dastardly/integration-tests` package
-- [x] Set up fixture directory structure (json/, yaml/, expected/)
-- [x] Implement fixture loading helpers
-- [x] Create cross-format conversion tests (JSON ↔ YAML)
-- [x] Create position tracking tests (source location accuracy)
-- [x] Create roundtrip tests (parse-serialize-parse fidelity)
-- [x] Add real-world fixture examples (package.json, docker-compose.yml, etc.)
-- [x] Add edge case tests (large numbers, unicode, deeply nested)
-- [x] Document integration testing patterns (CONTRIBUTING.md, ARCHITECTURE.md)
-- [x] Update all documentation files
-
-### Phase 1d: CSV Support (COMPLETED - Phase 2 RFC 4180 Compliant)
-- [x] Fork and integrate tree-sitter-csv (@dastardly/tree-sitter-csv)
-- [x] Migrate tree-sitter-csv bindings from deprecated `nan` to `node-addon-api`
-- [x] Fix tree-sitter 0.21+ compatibility (LANGUAGE_TYPE_TAG, wrapper pattern)
-- [x] Implement CSV → AST parser with support for CSV/TSV/PSV
-- [x] Handle headers (auto-detect, custom, or none), type inference, delimiters
-- [x] Implement AST → CSV serializer
-- [x] Support quote strategies (needed, all, nonnumeric, none)
-- [x] Support line ending options (LF, CRLF)
-- [x] Handle nested structures (error, json, flatten)
-- [x] **Phase 2: External scanner for RFC 4180 empty field support**
-  - [x] Implement stateless C scanner (src/scanner.c)
-  - [x] Grammar modifications for external scanner integration
-  - [x] Zero-width token detection for empty fields
-  - [x] Support all three variants (CSV, TSV, PSV)
-- [x] **Phase 3: Parse options support and integration testing**
-  - [x] Extend FormatPackage interface to support parse options
-  - [x] Implement CSVParseOptions (inferTypes, delimiter, headers)
-  - [x] Add CSV to integration tests (cross-format, roundtrip, position tracking)
-  - [x] All integration tests passing (161 tests: 77 CSV-specific)
-- [x] Comprehensive unit tests - 142 tests total (141 passing, 1 skipped for variable field counts)
-- [x] Document remaining limitations (variable field counts - lower priority)
-- [x] Create comprehensive README with API documentation and examples
-
-### Phase 2: Additional Formats
-
-When implementing a new format package:
+When implementing a new format package, follow the established pattern:
 
 1. **Create package structure** following JSON/YAML/CSV examples
 2. **Implement `FormatPackage<TSerializeOptions, TParseOptions>` interface**:
    - Export object implementing all required methods (`parse`, `serialize`)
    - Define format-specific `FormatSerializeOptions` extending `BaseSerializeOptions`
    - Define format-specific `FormatParseOptions` extending `BaseParseOptions` (if needed)
-   - `TParseOptions` defaults to `BaseParseOptions` for formats without parse-time options
+   - `TParseOptions` defaults to `BaseSerializeOptions` for formats without parse-time options
    - Export destructured convenience functions (`parse`, `serialize`)
    - Export public types (`FormatSerializeOptions`, `FormatParseOptions`)
    - Keep Parser classes and utility functions internal (not exported)
@@ -223,23 +156,7 @@ export type { FormatSerializeOptions, FormatParseOptions };
 // Parser classes, utility functions remain internal (not exported)
 ```
 
-**Upcoming formats**:
-- [ ] XML support (attributes, namespaces)
-- [ ] TOML support
-
-### Phase 3: Validation (COMPLETED)
-- [x] JSON Schema validator for dASTardly ASTs
-- [x] Comprehensive JSON Schema Draft 7 support (86.1% test suite compliance)
-- [x] Schema compilation architecture (AJV-inspired, cached validators)
-- [x] Modular keyword validators (type, string, number, array, object, combinators)
-- [x] Nested validation (properties, items, patternProperties, additionalProperties)
-- [x] $ref support (local JSON Pointer references)
-- [x] Conditional validation (if/then/else)
-- [x] Error reporting with source positions and JSON Pointers
-- [x] Fail-fast option for validation
-- [x] Official JSON Schema Test Suite integration (488/567 tests passing)
-- [x] Content-addressable validation caching
-- [x] Deep equality utilities for enum/const/uniqueItems validation
+**Roadmap**: See GitHub issues (`gh issue list`) for planned formats and features.
 
 ## Key Design Challenges
 

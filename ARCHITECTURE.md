@@ -28,12 +28,9 @@ dASTardly is a cross-format data parser and serializer that uses a common Abstra
 - **Validation**: Collect all errors by default, with optional fail-fast mode
 - **Serialization**: Throw errors for impossible conversions (e.g., nested objects to CSV)
 
-### Implementation Order
-1. **Phase 0**: Core AST package (in progress)
-2. **Phase 1a**: JSON parser and serializer
-3. **Phase 1b**: YAML parser and serializer
-4. **Phase 2**: Additional formats (XML, CSV, TOML)
-5. **Phase 3**: Schema validation
+### Implementation Approach
+
+The project was built incrementally, starting with core infrastructure and adding formats following a consistent pattern. Each format package implements the `FormatPackage` interface, ensuring API consistency.
 
 ### Technology Stack
 - **Package Manager**: pnpm (monorepo with workspaces)
@@ -747,107 +744,9 @@ The integration test suite runs automatically with `pnpm -r test` to ensure comp
 ### Format-Specific Considerations
 
 **YAML** (✅ Implemented): Anchors, aliases, tags, multi-line strings, multiple documents, merge keys
-**CSV** (✅ Implemented): Header handling, delimiter options, type inference, quote strategies, nested structure handling, RFC 4180 compliance (with documented grammar limitations)
-**XML** (Pending): Attributes, namespaces, CDATA, processing instructions
-**TOML** (Pending): Tables, array of tables, inline tables, datetime types
+**CSV** (✅ Implemented): Header handling, delimiter options, type inference, quote strategies, nested structure handling, RFC 4180 compliance
 
-See `IMPLEMENTATION_GUIDE.md` for detailed instructions on implementing each format.
-
-## Project Roadmap
-
-### Immediate Next Steps
-
-#### CSV Integration Tests ✅ **COMPLETED**
-CSV successfully integrated into the cross-format integration test suite.
-
-**Completed**:
-- ✅ Added 18 CSV fixtures to `packages/integration-tests/fixtures/csv/`
-  - Real-world examples (employee data, product catalog, sales data)
-  - Edge cases (empty fields, quoted fields, special characters)
-- ✅ Added CSV ↔ JSON conversion tests (23 tests)
-- ✅ Added CSV ↔ YAML conversion tests (11 tests)
-- ✅ Added CSV roundtrip tests (25 tests)
-- ✅ Added CSV position tracking tests (18 tests)
-- ✅ Extended FormatPackage interface to support parse options
-- ✅ Implemented CSVParseOptions (inferTypes, delimiter, headers)
-- ✅ All 161 integration tests passing (77 CSV-specific)
-
-**Results**:
-- Caught and fixed empty field handling edge cases
-- Validated CSV ↔ JSON/YAML type preservation with inferTypes option
-- Confirmed RFC 4180 compliance in roundtrip scenarios
-- Established pattern for adding future formats to integration tests
-
-### Short-term Goals
-
-#### TOML Support (20-25 hours)
-Implement `@dastardly/toml` package following established patterns.
-
-**Key Features**:
-- Tables and dotted keys
-- Array of tables syntax
-- Inline tables
-- Datetime type handling
-- Multi-line strings
-
-**Tree-sitter Grammar**: Use `@tree-sitter-grammars/tree-sitter-toml`
-
-**Justification**: TOML is simpler than XML (no attributes/namespaces), making it a good next step after CSV. Popular for config files (Cargo.toml, pyproject.toml). Provides good learning curve progression: JSON (simple) → YAML (complex) → CSV (flat) → TOML (middle ground) → XML (very complex).
-
-**Estimated Effort**: 20-25 hours (simpler than YAML/XML)
-
-#### XML Support (25-30 hours)
-Implement `@dastardly/xml` package with full attribute and namespace support.
-
-**Key Features**:
-- Elements with attributes (stored in metadata)
-- Namespace handling (prefixes, xmlns declarations)
-- CDATA sections
-- Processing instructions
-- Mixed content (text + elements)
-- Entity references
-
-**Tree-sitter Grammar**: Use `@tree-sitter-grammars/tree-sitter-xml`
-
-**Justification**: Complex format demonstrating metadata storage patterns. Widely used for config files, data exchange, document formats. Last format before moving to Phase 3 (validation).
-
-**Estimated Effort**: 25-30 hours (similar to YAML complexity)
-
-### Long-term Goals
-
-#### Phase 3: Validation Infrastructure (40+ hours)
-Implement cross-format schema validation - the core value proposition.
-
-**Key Features**:
-- JSON Schema validator
-- Cross-format schema validation
-- Error reporting with source positions (from original format)
-- Fail-fast option for validation
-- Schema generation from AST
-
-**Use Case Example**:
-```typescript
-// Validate YAML against JSON Schema, report errors at YAML line numbers
-const schema = loadJSONSchema('config.schema.json');
-const yamlDoc = yaml.parse(yamlSource);
-const result = validator.validate(yamlDoc, schema);
-// result.errors contain YAML source locations
-```
-
-**Justification**: This is the ultimate goal - enabling text editors to validate any format against any schema with accurate error reporting.
-
-**Estimated Effort**: 40+ hours
-
-### Roadmap Timeline
-
-| Milestone | Estimated Effort | Target |
-|-----------|-----------------|--------|
-| CSV Integration Tests | 3-5 hours | Immediate |
-| TOML Support | 20-25 hours | Short-term |
-| XML Support | 25-30 hours | Short-term |
-| Phase 3: Validation | 40+ hours | Long-term |
-
-**Total Remaining**: ~90-100 hours to complete all planned features
+See `IMPLEMENTATION_GUIDE.md` for detailed instructions on implementing new formats.
 
 ## References
 
