@@ -133,7 +133,7 @@
         "members": [
           {
             "type": "PATTERN",
-            "value": "[^\t\\s\",][^\t\\s\"]*"
+            "value": "[^\t\\r\\n\",][^\t\\r\\n\"]*"
           },
           {
             "type": "SEQ",
@@ -207,12 +207,7 @@
       ]
     }
   },
-  "extras": [
-    {
-      "type": "PATTERN",
-      "value": "\\s"
-    }
-  ],
+  "extras": [],
   "conflicts": [],
   "precedences": [],
   "externals": [

@@ -28,6 +28,9 @@ module.exports = function defineGrammar(dialect, separator) {
       $._error_sentinel,
     ],
 
+    // Do not skip whitespace - spaces are significant in CSV fields
+    extras: $ => [],
+
     rules: {
       document: $ => choice(
         seq(repeat1(seq($.row, /\r|\r\n|\n/)), optional($.row)),
@@ -44,9 +47,10 @@ module.exports = function defineGrammar(dialect, separator) {
       field: $ => choice($.boolean, $.float, $.number, $.text, $.empty_field),
 
       text: _ => token(choice(
-        // Unquoted text: anything except separator, whitespace, or quotes
-        // Can include hyphens, digits mixed with non-digits (e.g., "2024-01-01")
-        new RegExp(`[^${separator}\\s",][^${separator}\\s"]*`),
+        // Unquoted text: anything except separator, newlines, or quotes
+        // Per RFC 4180, spaces ARE allowed in unquoted fields (TEXTDATA includes %x20)
+        // Can include hyphens, digits, spaces (e.g., "Employee 1", "2024-01-01")
+        new RegExp(`[^${separator}\\r\\n",][^${separator}\\r\\n"]*`),
         // Quoted text: anything inside quotes, with "" for escaped quotes
         seq('"', repeat(choice(/[^"]/, '""')), '"'),
       )),
