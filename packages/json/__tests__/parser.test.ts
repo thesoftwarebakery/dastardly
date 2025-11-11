@@ -178,6 +178,19 @@ describe('JSONParser', () => {
       expect(doc.body.elements[0]).toMatchObject({ type: 'Array' });
       expect(doc.body.elements[1]).toMatchObject({ type: 'Array' });
     });
+
+    it('parses deeply nested arrays (5 levels)', () => {
+      const doc = parser.parse('[[[[[1]]]]]');
+      expect(doc.body.type).toBe('Array');
+      // Verify we can access deeply nested structure
+      let current: any = doc.body;
+      for (let i = 0; i < 5; i++) {
+        expect(current.type).toBe('Array');
+        expect(current.elements).toHaveLength(1);
+        current = current.elements[0];
+      }
+      expect(current).toMatchObject({ type: 'Number', value: 1 });
+    });
   });
 
   describe('objects', () => {
@@ -216,6 +229,21 @@ describe('JSONParser', () => {
       expect(prop.value).toMatchObject({
         type: 'Object',
       });
+    });
+
+    it('parses deeply nested objects (5 levels)', () => {
+      const doc = parser.parse('{"a":{"a":{"a":{"a":{"a":1}}}}}');
+      expect(doc.body.type).toBe('Object');
+      // Verify we can access deeply nested structure
+      let current: any = doc.body;
+      for (let i = 0; i < 5; i++) {
+        expect(current.type).toBe('Object');
+        expect(current.properties).toHaveLength(1);
+        const prop = current.properties[0];
+        expect(prop.key.value).toBe('a');
+        current = prop.value;
+      }
+      expect(current).toMatchObject({ type: 'Number', value: 1 });
     });
 
     it('parses object with all value types', () => {
