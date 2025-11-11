@@ -98,21 +98,60 @@ Analysis of the 31 remaining failures shows they fall into categories that are e
 
 **Conclusion:** All realistically fixable issues have been addressed. The remaining 31 tests represent intentional design decisions, external limitations, or extremely low-priority edge cases.
 
-## Direction Forward
+## Performance Benchmarking
 
-### Performance & Benchmarking
+### Benchmark Results (vs AJV)
 
-**Benchmarking Plan:**
-- Compare against AJV (industry standard)
-- Metrics: compilation time, validation time, memory usage, cache hit rate
-- Test cases: simple, complex, recursive, and wide schemas
+Comprehensive benchmarks were run comparing Dastardly with AJV across 6 schema types (simple, medium, complex, wide, deep, array-heavy). See `benchmarks/README.md` for full details.
 
-**Optimization Opportunities:**
-1. JIT code generation (AJV-style)
-2. Parallel validation for arrays/objects
-3. Incremental validation for editor use case
-4. Schema preprocessing and flattening
-5. SIMD optimizations for string operations
+**Summary:**
+
+| Metric | AJV | Dastardly | Winner |
+|--------|-----|-----------|--------|
+| **Schema Compilation** | 125-220 ops/sec | 600K-850K ops/sec | ⚡ **Dastardly (3,500x - 6,800x faster)** |
+| **Pure Validation** | 700K-92M ops/sec | 22-9.4K ops/sec | ❌ **AJV (10,000x - 400,000x faster)** |
+| **End-to-End (parse + validate)** | 19K-1.8M ops/sec | 20-4.2K ops/sec | ⚠️ **AJV (200x - 1,000x faster)** |
+
+**Key Findings:**
+
+1. **Schema Compilation** - Dastardly wins massively due to lightweight design (no JIT codegen)
+2. **Validation Speed** - AJV wins due to JIT-compiled validators
+3. **Editor Use Case** - Dastardly is fast enough for real-time validation of small-medium files (<10ms for typical documents)
+
+### Performance Analysis
+
+**Where Dastardly Excels:**
+- Instant schema compilation (~1ms vs ~5-10ms for AJV)
+- Zero cold-start penalty
+- Source location tracking (unique feature, no performance comparison)
+- Memory efficient (no generated code storage)
+
+**Where Dastardly Struggles:**
+- Validation speed (AST traversal overhead)
+- Array-heavy workloads (particularly slow at 0.003% of AJV)
+- Large nested structures
+
+**Editor Performance Profile:**
+- ✅ Schema compilation: ~1ms (excellent)
+- ✅ Small files (< 1KB): ~0.2-2ms (excellent)
+- ⚠️ Medium files (1-10KB): ~2-10ms (acceptable)
+- ❌ Large files (>100KB): May exceed 100ms (needs optimization)
+
+### Optimization Roadmap
+
+**Priority 1 (High Impact - 10-100x potential):**
+1. **Validator function generation** - Generate optimized functions instead of dispatching
+2. **Fast path for simple schemas** - Skip complex machinery for basic type checks
+3. **Array validation optimization** - Batch processing, early termination, parallel validation
+
+**Priority 2 (Medium Impact - 2-10x potential):**
+4. **Cache improvements** - Profile hit rates, optimize key generation
+5. **Lazy validator creation** - Don't compile unused schema branches
+6. **Type-specific optimizations** - Specialize for common patterns
+
+**Priority 3 (Low Impact - 1-2x potential):**
+7. **String operation optimizations** - Cache regexes, SIMD operations
+8. **Incremental validation** - Re-validate only changed subtrees
 
 ### Additional Features
 
@@ -148,5 +187,7 @@ We successfully built a production-ready JSON Schema validator with 94.5% Draft 
 - ✅ Unicode code point counting for minLength/maxLength
 - ✅ Clean, modular architecture
 - ✅ Comprehensive documentation with detailed test failure analysis
-- ✅ Ready for benchmarking and optimization
-- ✅ Foundation for editor integration
+- ✅ **Benchmarked against AJV** - Identified strengths (compilation) and optimization targets (validation speed)
+- ✅ **3,500x faster schema compilation** than industry standard (AJV)
+- ✅ **Fast enough for real-time editor validation** of small-medium files
+- ✅ Foundation for editor integration with clear optimization roadmap

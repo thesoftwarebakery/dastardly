@@ -34,7 +34,7 @@ const formatValidators: Record<string, FormatValidator> = {
     const match = str.match(time);
     if (!match) return false;
     const [, hours, minutes, seconds] = match;
-    return parseInt(hours) < 24 && parseInt(minutes) < 60 && parseInt(seconds) < 60;
+    return parseInt(hours!) < 24 && parseInt(minutes!) < 60 && parseInt(seconds!) < 60;
   },
 
   // Email formats (RFC 5321)
