@@ -9,7 +9,8 @@
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "benchmark": "pnpm build && npx tsx benchmarks/run.ts"
   },
   "keywords": [
     "json-schema",

@@ -67,6 +67,33 @@ pnpm -r test
 
 **Total: 696 tests passing** (1 skipped test for CSV variable field counts)
 
+## Benchmarking
+
+Comprehensive performance benchmarks are available for all format packages and validation:
+
+```bash
+# Run all benchmarks
+pnpm benchmark
+
+# Run specific package benchmarks
+pnpm benchmark:json       # JSON vs native JSON.parse/stringify
+pnpm benchmark:yaml       # YAML vs js-yaml
+pnpm benchmark:csv        # CSV vs csv-parse/csv-stringify
+pnpm benchmark:validation # JSON Schema validation vs AJV
+```
+
+Each benchmark suite includes:
+- **Parse Performance**: String → AST/Object
+- **Serialize Performance**: AST/Object → String
+- **Roundtrip Performance**: Full cycle benchmarks
+- **Memory Usage**: Heap consumption analysis
+
+See individual package benchmark READMEs for detailed results and analysis:
+- [JSON Benchmarks](packages/json/benchmarks/README.md)
+- [YAML Benchmarks](packages/yaml/benchmarks/README.md)
+- [CSV Benchmarks](packages/csv/benchmarks/README.md)
+- [Validation Benchmarks](packages/validation/benchmarks/README.md)
+
 ## Documentation
 
 - **[ARCHITECTURE.md](ARCHITECTURE.md)**: Technical design and implementation details

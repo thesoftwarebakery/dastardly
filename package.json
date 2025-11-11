@@ -10,7 +10,12 @@
     "typecheck": "pnpm -r typecheck",
     "clean": "pnpm -r exec rm -rf dist node_modules",
     "format": "prettier --write \"**/*.{ts,js,json,md}\"",
-    "format:check": "prettier --check \"**/*.{ts,js,json,md}\""
+    "format:check": "prettier --check \"**/*.{ts,js,json,md}\"",
+    "benchmark": "pnpm benchmark:json && pnpm benchmark:yaml && pnpm benchmark:csv && pnpm benchmark:validation",
+    "benchmark:json": "pnpm --filter @dastardly/json benchmark",
+    "benchmark:yaml": "pnpm --filter @dastardly/yaml benchmark",
+    "benchmark:csv": "pnpm --filter @dastardly/csv benchmark",
+    "benchmark:validation": "pnpm --filter @dastardly/validation benchmark"
   },
   "keywords": [
     "parser",

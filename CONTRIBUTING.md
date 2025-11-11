@@ -444,6 +444,160 @@ Add format to `packages/integration-tests/README.md`:
 - **TOML**: Datetime types need special handling in conversions
 - **XML**: Attributes stored in metadata - test attribute preservation/conversion
 
+## Benchmarking
+
+All format packages include comprehensive performance benchmarks comparing dASTardly against industry-standard libraries.
+
+### Running Benchmarks
+
+```bash
+# Run all benchmarks
+pnpm benchmark
+
+# Run specific package benchmarks
+pnpm benchmark:json       # JSON vs native JSON.parse/stringify
+pnpm benchmark:yaml       # YAML vs js-yaml
+pnpm benchmark:csv        # CSV vs csv-parse/csv-stringify
+pnpm benchmark:validation # JSON Schema validation vs AJV
+
+# Run from within a package
+cd packages/json
+pnpm benchmark
+
+# With garbage collection for accurate memory measurements
+node --expose-gc $(which tsx) benchmarks/run.ts
+```
+
+### Benchmark Structure
+
+Each format package includes:
+
+```
+packages/<format>/
+├── benchmarks/
+│   ├── fixtures.ts    # Test data (6 complexity levels)
+│   ├── run.ts         # Benchmark runner
+│   └── README.md      # Results and analysis
+```
+
+### Benchmark Categories
+
+1. **Parse Performance**: String → AST/Object
+2. **Serialize Performance**: AST/Object → String
+3. **Roundtrip Performance**: Full parse-serialize-parse cycle
+4. **Memory Usage**: Heap consumption analysis (100 iterations)
+
+### Test Fixtures
+
+All benchmarks use 6 complexity levels:
+
+| Fixture | Size | Description |
+|---------|------|-------------|
+| tiny | ~100 bytes | Minimal data |
+| small | ~1 KB | Typical config file |
+| medium | ~10 KB | Moderate complexity |
+| large | ~100 KB | Large dataset |
+| wide | ~50 KB | Many properties/columns |
+| arrayHeavy | ~100 KB | Large arrays |
+
+### Adding Benchmarks for New Formats
+
+When creating a new format package, add benchmarks following this pattern:
+
+**1. Install Dependencies** (package.json):
+
+```json
+{
+  "scripts": {
+    "benchmark": "pnpm build && npx tsx benchmarks/run.ts"
+  },
+  "devDependencies": {
+    "@types/benchmark": "^2.1.5",
+    "benchmark": "^2.1.4",
+    "<comparison-library>": "^x.x.x"
+  }
+}
+```
+
+**2. Create fixtures.ts** with 6 complexity levels matching the format's characteristics.
+
+**3. Create run.ts** using Benchmark.js:
+
+```typescript
+import Benchmark from 'benchmark';
+import { format } from '../src/index.js';
+import { fixtures } from './fixtures.js';
+import * as comparisonLib from '<comparison-library>';
+
+// Parse benchmarks
+function runParseBenchmarks(fixture) {
+  return new Promise((resolve) => {
+    new Benchmark.Suite()
+      .add('dASTardly', () => format.parse(fixture.data))
+      .add('Comparison Lib', () => comparisonLib.parse(fixture.data))
+      .on('complete', function() {
+        // Log results
+        resolve();
+      })
+      .run();
+  });
+}
+```
+
+**4. Create README.md** documenting:
+- How to run benchmarks
+- Benchmark categories
+- Test fixtures
+- Comparison library details
+- Expected results (add actual results after running)
+- Performance analysis
+- When to use dASTardly vs comparison library
+
+**5. Add to Root Benchmark Scripts** (root package.json):
+
+```json
+{
+  "scripts": {
+    "benchmark": "... && pnpm benchmark:<format>",
+    "benchmark:<format>": "pnpm --filter @dastardly/<format> benchmark"
+  }
+}
+```
+
+### Benchmark Comparison Libraries
+
+| Format | Comparison Library | Notes |
+|--------|-------------------|-------|
+| JSON | Native JSON.parse/stringify | V8 built-in, highly optimized |
+| YAML | js-yaml | Most popular, 19M+ downloads/week |
+| CSV | csv-parse/csv-stringify | Popular streaming library, 2M+ downloads/week |
+| Validation | AJV | Industry standard, JIT compilation |
+
+### Performance Expectations
+
+dASTardly prioritizes **correctness** and **position tracking** over raw speed:
+
+**Expected Performance Characteristics:**
+- **Parse**: 2-10x slower than native/optimized libraries (acceptable for editor use)
+- **Serialize**: Competitive performance
+- **Memory**: 2-4x higher due to position tracking and AST metadata
+- **Unique advantages**: Position tracking, cross-format conversion, error recovery
+
+**Performance Goals:**
+- Parse files < 100 KB in < 100ms
+- No blocking on editor keystroke (with incremental parsing)
+- Memory usage proportional to file size
+
+### When to Run Benchmarks
+
+Run benchmarks:
+- **After performance optimizations** - Verify improvements
+- **Before releases** - Ensure no regressions
+- **When adding features** - Check performance impact
+- **Comparing approaches** - Data-driven decisions
+
+Don't over-optimize prematurely. Profile first, optimize hot paths only.
+
 ## Performance Considerations
 
 This library is designed for **real-time editor feedback**, so performance is critical:
