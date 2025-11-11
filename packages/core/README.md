@@ -455,9 +455,9 @@ console.log(obj.age);  // 30
 ## Documentation
 
 For more information:
-- [Main Repository](https://github.com/yourusername/dastardly)
-- [Architecture Documentation](https://github.com/yourusername/dastardly/blob/main/ARCHITECTURE.md)
-- [Contributing Guide](https://github.com/yourusername/dastardly/blob/main/CONTRIBUTING.md)
+- [Main Repository](https://github.com/thesoftwarebakery/dastardly)
+- [Architecture Documentation](https://github.com/thesoftwarebakery/dastardly/blob/main/ARCHITECTURE.md)
+- [Contributing Guide](https://github.com/thesoftwarebakery/dastardly/blob/main/CONTRIBUTING.md)
 
 ## License
 

@@ -5,12 +5,24 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist/**",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "benchmark": "pnpm build && npx tsx benchmarks/run.ts"
+    "benchmark": "pnpm build && npx tsx benchmarks/run.ts",
+    "prepublishOnly": "pnpm build && pnpm test"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
   "keywords": [
     "csv",
@@ -21,8 +33,18 @@
     "ast",
     "tree-sitter"
   ],
-  "author": "",
+  "author": "The Software Bakery",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thesoftwarebakery/dastardly.git",
+    "directory": "packages/csv"
+  },
+  "homepage": "https://github.com/thesoftwarebakery/dastardly#readme",
+  "bugs": "https://github.com/thesoftwarebakery/dastardly/issues",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@dastardly/core": "workspace:^",
     "@dastardly/tree-sitter-csv": "workspace:^",

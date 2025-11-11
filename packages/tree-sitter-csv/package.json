@@ -4,15 +4,16 @@
   "description": "CSV, PSV, & TSV grammar for tree-sitter (dASTardly fork with prebuilt binaries)",
   "main": "bindings/node",
   "files": [
-    "grammar.js",
     "binding.gyp",
-    "prebuilds/**",
     "bindings/node/*",
-    "queries/*",
-    "src/**",
+    "common/**",
+    "csv/grammar.js",
     "csv/src/**",
+    "psv/grammar.js",
     "psv/src/**",
-    "tsv/src/**"
+    "tsv/grammar.js",
+    "tsv/src/**",
+    "src/**"
   ],
   "keywords": [
     "parsing",
@@ -21,8 +22,18 @@
     "psv",
     "tsv"
   ],
-  "author": "Amaan Qureshi <amaanq12@gmail.com>",
+  "author": "The Software Bakery (original by Amaan Qureshi <amaanq12@gmail.com>)",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thesoftwarebakery/dastardly.git",
+    "directory": "packages/tree-sitter-csv"
+  },
+  "homepage": "https://github.com/thesoftwarebakery/dastardly#readme",
+  "bugs": "https://github.com/thesoftwarebakery/dastardly/issues",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "node-addon-api": "^8.2.2",
     "node-gyp-build": "^4.8.2"

@@ -477,9 +477,9 @@ const doc = parser.parseIncremental(newSource, edit);
 ## Documentation
 
 For more information:
-- [Main Repository](https://github.com/yourusername/dastardly)
-- [Architecture Documentation](https://github.com/yourusername/dastardly/blob/main/ARCHITECTURE.md)
-- [Implementation Guide](https://github.com/yourusername/dastardly/blob/main/IMPLEMENTATION_GUIDE.md)
+- [Main Repository](https://github.com/thesoftwarebakery/dastardly)
+- [Architecture Documentation](https://github.com/thesoftwarebakery/dastardly/blob/main/ARCHITECTURE.md)
+- [Implementation Guide](https://github.com/thesoftwarebakery/dastardly/blob/main/IMPLEMENTATION_GUIDE.md)
 
 ## License
 

@@ -5,19 +5,41 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
+  "files": [
+    "dist/**",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepublishOnly": "pnpm build && pnpm test"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
   "keywords": [
     "tree-sitter",
     "parser",
     "ast"
   ],
-  "author": "",
+  "author": "The Software Bakery",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thesoftwarebakery/dastardly.git",
+    "directory": "packages/tree-sitter-runtime"
+  },
+  "homepage": "https://github.com/thesoftwarebakery/dastardly#readme",
+  "bugs": "https://github.com/thesoftwarebakery/dastardly/issues",
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@dastardly/core": "workspace:^",
     "tree-sitter": "^0.21.0"
