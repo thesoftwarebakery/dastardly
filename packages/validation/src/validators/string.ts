@@ -3,9 +3,19 @@
 import type { KeywordValidator } from '../compiler-types.js';
 
 /**
+ * Get the Unicode code point length of a string
+ * Counts actual Unicode code points, not UTF-16 code units
+ * This correctly handles supplementary characters (emoji, etc.)
+ */
+function getCodePointLength(str: string): number {
+  // Use Array.from or spread operator to split by code points
+  return [...str].length;
+}
+
+/**
  * Create a minLength validator
  *
- * @param minLength - Minimum string length
+ * @param minLength - Minimum string length (in Unicode code points)
  * @returns Keyword validator for minLength
  */
 export function createMinLengthValidator(minLength: number): KeywordValidator {
@@ -13,11 +23,12 @@ export function createMinLengthValidator(minLength: number): KeywordValidator {
     validate(node, pointer, schemaPath) {
       if (node.type !== 'String') return [];
 
-      if (node.value.length < minLength) {
+      const length = getCodePointLength(node.value);
+      if (length < minLength) {
         return [
           {
             path: pointer,
-            message: `String length ${node.value.length} is less than minimum ${minLength}`,
+            message: `String length ${length} is less than minimum ${minLength}`,
             keyword: 'minLength',
             schemaPath: `${schemaPath}/minLength`,
             location: node.loc,
@@ -36,7 +47,7 @@ export function createMinLengthValidator(minLength: number): KeywordValidator {
 /**
  * Create a maxLength validator
  *
- * @param maxLength - Maximum string length
+ * @param maxLength - Maximum string length (in Unicode code points)
  * @returns Keyword validator for maxLength
  */
 export function createMaxLengthValidator(maxLength: number): KeywordValidator {
@@ -44,11 +55,12 @@ export function createMaxLengthValidator(maxLength: number): KeywordValidator {
     validate(node, pointer, schemaPath) {
       if (node.type !== 'String') return [];
 
-      if (node.value.length > maxLength) {
+      const length = getCodePointLength(node.value);
+      if (length > maxLength) {
         return [
           {
             path: pointer,
-            message: `String length ${node.value.length} is greater than maximum ${maxLength}`,
+            message: `String length ${length} is greater than maximum ${maxLength}`,
             keyword: 'maxLength',
             schemaPath: `${schemaPath}/maxLength`,
             location: node.loc,
