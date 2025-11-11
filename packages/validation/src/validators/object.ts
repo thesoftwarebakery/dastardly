@@ -293,6 +293,53 @@ export function createAdditionalPropertiesValidator(
 }
 
 /**
+ * Create a propertyNames validator
+ *
+ * Validates that all property names in an object match a schema
+ *
+ * @param propertyNamesSchema - Schema that property names must match
+ * @param compiler - Schema compiler for caching subschemas
+ * @returns Keyword validator for propertyNames
+ */
+export function createPropertyNamesValidator(
+  propertyNamesSchema: JSONSchema7Definition,
+  compiler: SchemaCompiler
+): KeywordValidator {
+  return {
+    validate(node, pointer, schemaPath, context) {
+      if (node.type !== 'Object') return [];
+
+      const errors = [];
+
+      // Validate each property name as a string node
+      for (const prop of node.properties) {
+        // Create a temporary string node for the property name
+        const nameNode = {
+          type: 'String' as const,
+          value: prop.key.value,
+          loc: prop.key.loc,
+        };
+
+        const nameErrors = validateAgainstSchema(
+          nameNode,
+          propertyNamesSchema,
+          pointer,
+          `${schemaPath}/propertyNames`,
+          context,
+          compiler
+        );
+
+        errors.push(...nameErrors);
+      }
+
+      return errors;
+    },
+
+    appliesTo: (node) => node.type === 'Object',
+  };
+}
+
+/**
  * Create a dependencies validator
  *
  * Validates property dependencies - when a property is present,

@@ -31,6 +31,7 @@ import {
   createPatternPropertiesValidator,
   createAdditionalPropertiesValidator,
   createDependenciesValidator,
+  createPropertyNamesValidator,
 } from './validators/object.js';
 import { createEnumValidator, createConstValidator } from './validators/basic.js';
 import {
@@ -42,6 +43,7 @@ import {
 import { createBooleanSchemaValidator } from './validators/boolean-schema.js';
 import { createRefValidator } from './validators/ref.js';
 import { createIfThenElseValidator } from './validators/conditional.js';
+import { createFormatValidator } from './validators/format.js';
 
 /**
  * Schema compiler
@@ -132,6 +134,9 @@ export class SchemaCompiler {
     if (schema.pattern !== undefined) {
       validators.push(createPatternValidator(schema.pattern));
     }
+    if (schema.format !== undefined) {
+      validators.push(createFormatValidator(schema.format));
+    }
 
     // Number validators
     if (schema.minimum !== undefined) {
@@ -200,6 +205,9 @@ export class SchemaCompiler {
     }
     if (schema.dependencies !== undefined) {
       validators.push(createDependenciesValidator(schema.dependencies, this));
+    }
+    if (schema.propertyNames !== undefined) {
+      validators.push(createPropertyNamesValidator(schema.propertyNames, this));
     }
 
     // Combinator validators
