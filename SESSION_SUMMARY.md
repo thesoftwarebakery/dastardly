@@ -5,7 +5,7 @@
 
 ## What Was Built
 
-### 1. Core AST Package (`@dastardly/core`) ✅
+### 1. Core AST Package (`@bakes/dastardly-core`) ✅
 **Status**: Complete and tested
 - **Discriminated union AST types** (proper type narrowing)
 - Position tracking (line, column, offset)
@@ -18,7 +18,7 @@
 
 **Key Decision**: Refactored from interface inheritance to type aliases for proper discriminated union narrowing (TypeScript#56106)
 
-### 2. Tree-Sitter Runtime Package (`@dastardly/tree-sitter-runtime`) ✅
+### 2. Tree-Sitter Runtime Package (`@bakes/dastardly-tree-sitter-runtime`) ✅
 **Status**: Complete and tested
 - **Runtime abstraction** (Node.js now, WASM-ready)
 - TreeSitterParser base class
@@ -30,7 +30,7 @@
 
 **Key Decision**: Added incremental parsing types/interfaces but marked @internal - foundation in place without API complexity
 
-### 3. JSON Package (`@dastardly/json`) ✅
+### 3. JSON Package (`@bakes/dastardly-json`) ✅
 **Status**: Complete reference implementation
 - **JSONParser** class (tree-sitter JSON → AST)
 - **serialize()** function (AST → JSON)
@@ -49,7 +49,7 @@
 - Production: ~600 lines
 - Tests: ~1,500 lines
 
-### 4. YAML Package (`@dastardly/yaml`) ✅
+### 4. YAML Package (`@bakes/dastardly-yaml`) ✅
 **Status**: Complete with advanced YAML features
 - **YAMLParser** class (tree-sitter YAML → AST)
   - All scalar types (plain, quoted, block scalars with `|`, `|-`, `|+`)
@@ -111,10 +111,10 @@
 
 | Package | Tests | Status |
 |---------|-------|--------|
-| @dastardly/core | 78 | ✅ All passing |
-| @dastardly/tree-sitter-runtime | 36 | ✅ All passing |
-| @dastardly/json | 115 | ✅ All passing |
-| @dastardly/yaml | 245 | ✅ All passing |
+| @bakes/dastardly-core | 78 | ✅ All passing |
+| @bakes/dastardly-tree-sitter-runtime | 36 | ✅ All passing |
+| @bakes/dastardly-json | 115 | ✅ All passing |
+| @bakes/dastardly-yaml | 245 | ✅ All passing |
 | **Total** | **474** | ✅ **All passing** |
 
 ## Build Status

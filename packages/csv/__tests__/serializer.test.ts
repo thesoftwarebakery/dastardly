@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { serialize } from '../src/serializer.js';
-import { arrayNode, objectNode, stringNode, numberNode, booleanNode, nullNode, propertyNode } from '@dastardly/core';
+import { arrayNode, objectNode, stringNode, numberNode, booleanNode, nullNode, propertyNode } from '@bakes/dastardly-core';
 
 describe('CSV Serializer', () => {
   describe('Basic serialization', () => {

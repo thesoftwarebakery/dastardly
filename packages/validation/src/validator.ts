@@ -1,8 +1,8 @@
 // JSON Schema validator for dASTardly ASTs
 
 import type { JSONSchema7 } from 'json-schema';
-import type { DocumentNode, DataNode, NodeIdentity } from '@dastardly/core';
-import { computeIdentities } from '@dastardly/core';
+import type { DocumentNode, DataNode, NodeIdentity } from '@bakes/dastardly-core';
+import { computeIdentities } from '@bakes/dastardly-core';
 import { ValidationCache } from './cache.js';
 import type { ValidationResult, ValidationError } from './types.js';
 import { SchemaCompiler } from './compiler.js';

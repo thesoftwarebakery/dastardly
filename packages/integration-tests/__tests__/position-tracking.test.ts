@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { parse as parseJSON } from '@dastardly/json';
-import { parse as parseYAML } from '@dastardly/yaml';
-import { parse as parseCSV } from '@dastardly/csv';
+import { parse as parseJSON } from '@bakes/dastardly-json';
+import { parse as parseYAML } from '@bakes/dastardly-yaml';
+import { parse as parseCSV } from '@bakes/dastardly-csv';
 import {
   assertAllPositionsValid,
   assertSourceLocationValid,
   assertPositionRangesValid,
 } from './helpers/assertions.js';
 import { loadJSONFixture, loadYAMLFixture, loadCSVFixture } from './helpers/fixtures.js';
-import type { ArrayNode, ObjectNode } from '@dastardly/core';
+import type { ArrayNode, ObjectNode } from '@bakes/dastardly-core';
 
 describe('Position tracking', () => {
   describe('JSON position tracking', () => {

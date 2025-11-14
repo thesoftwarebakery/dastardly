@@ -1,7 +1,7 @@
-// @dastardly/yaml - YAML parser and serializer
+// @bakes/dastardly-yaml - YAML parser and serializer
 
-import type { DocumentNode, DataNode, FormatPackage } from '@dastardly/core';
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
+import type { DocumentNode, DataNode, FormatPackage } from '@bakes/dastardly-core';
+import { NodeTreeSitterRuntime } from '@bakes/dastardly-tree-sitter-runtime';
 import YAML_LANGUAGE from '@tree-sitter-grammars/tree-sitter-yaml';
 
 // Export public types
@@ -19,7 +19,7 @@ import { serialize as serializeNode, type YAMLSerializeOptions } from './seriali
  *
  * @example
  * ```typescript
- * import { yaml } from '@dastardly/yaml';
+ * import { yaml } from '@bakes/dastardly-yaml';
  *
  * // Parse YAML
  * const ast = yaml.parse('name: Alice\nage: 30');

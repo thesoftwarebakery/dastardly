@@ -11,7 +11,7 @@ import {
   objectNode,
   arrayNode,
   documentNode,
-} from '@dastardly/core';
+} from '@bakes/dastardly-core';
 
 const loc = sourceLocation(position(1, 0, 0), position(1, 10, 10));
 

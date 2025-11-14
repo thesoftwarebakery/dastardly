@@ -1,4 +1,4 @@
-# @dastardly/tree-sitter-csv
+# @bakes/dastardly-tree-sitter-csv
 
 CSV, PSV, and TSV grammars for [tree-sitter](https://github.com/tree-sitter/tree-sitter).
 
@@ -6,18 +6,18 @@ CSV, PSV, and TSV grammars for [tree-sitter](https://github.com/tree-sitter/tree
 - RFC 4180 compliant with external scanner for empty field support
 - Migrated from deprecated `nan` to `node-addon-api` for modern Node.js compatibility
 - Tree-sitter 0.21+ compatibility
-- Used by [@dastardly/csv](https://npmjs.com/package/@dastardly/csv) parser
+- Used by [@bakes/dastardly-csv](https://npmjs.com/package/@bakes/dastardly-csv) parser
 
 Original grammar by [Amaan Qureshi](https://github.com/amaanq/tree-sitter-csv).
 
 ## Installation
 
 ```bash
-npm install @dastardly/tree-sitter-csv
+npm install @bakes/dastardly-tree-sitter-csv
 ```
 
 ```bash
-pnpm add @dastardly/tree-sitter-csv
+pnpm add @bakes/dastardly-tree-sitter-csv
 ```
 
 **Note:** This package requires build tools (node-gyp, C compiler) for installation. The native bindings will be compiled during `npm install`.
@@ -27,7 +27,7 @@ pnpm add @dastardly/tree-sitter-csv
 This module exports three tree-sitter grammars for different delimiter types:
 
 ```js
-const { csv, psv, tsv } = require('@dastardly/tree-sitter-csv');
+const { csv, psv, tsv } = require('@bakes/dastardly-tree-sitter-csv');
 
 // CSV grammar (comma-delimited)
 const Parser = require('tree-sitter');

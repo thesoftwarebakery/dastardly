@@ -344,7 +344,7 @@ export function createUniqueItemsValidator(uniqueItems: boolean): KeywordValidat
  * Serialize a node to a string for uniqueness comparison
  * Uses the same logic as extractValue but returns JSON string
  */
-function serializeNode(node: import('@dastardly/core').DataNode): string {
+function serializeNode(node: import('@bakes/dastardly-core').DataNode): string {
   const value = extractValue(node);
   return JSON.stringify(value);
 }
@@ -352,7 +352,7 @@ function serializeNode(node: import('@dastardly/core').DataNode): string {
 /**
  * Extract plain JavaScript value from AST node
  */
-function extractValue(node: import('@dastardly/core').DataNode): unknown {
+function extractValue(node: import('@bakes/dastardly-core').DataNode): unknown {
   switch (node.type) {
     case 'String':
       return node.value;

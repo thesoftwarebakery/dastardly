@@ -10,7 +10,7 @@ Verify that documentation is up-to-date and consistent with the current codebase
 
 2. **Check version consistency**:
    - Verify all package.json files have consistent dependencies
-   - Check that @dastardly/* dependencies use `workspace:*`
+   - Check that @bakes/dastardly-* dependencies use `workspace:*`
 
 3. **Check for outdated information**:
    - Compare AST node types in code vs ARCHITECTURE.md

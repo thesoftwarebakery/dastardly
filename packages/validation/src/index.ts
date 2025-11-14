@@ -1,4 +1,4 @@
-// @dastardly/validation - JSON Schema validator for dASTardly ASTs
+// @bakes/dastardly-validation - JSON Schema validator for dASTardly ASTs
 
 // Export types
 export type { ValidationError, ValidationResult } from './types.js';

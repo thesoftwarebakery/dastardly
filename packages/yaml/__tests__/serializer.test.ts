@@ -13,7 +13,7 @@ import {
   sourceLocation,
   position,
   toNative,
-} from '@dastardly/core';
+} from '@bakes/dastardly-core';
 
 // Helper to create dummy location
 const loc = sourceLocation(position(1, 0, 0), position(1, 1, 1), 'yaml');

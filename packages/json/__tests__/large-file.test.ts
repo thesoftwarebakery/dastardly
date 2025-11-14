@@ -2,7 +2,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { json } from '../src/index.js';
-import { isArrayNode, isObjectNode } from '@dastardly/core';
+import { isArrayNode, isObjectNode } from '@bakes/dastardly-core';
 
 describe('Large JSON file parsing', () => {
   function generateLargeJSON(sizeInKB: number): string {

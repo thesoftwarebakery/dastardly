@@ -1,7 +1,7 @@
 // Type validation keyword
 
 import type { JSONSchema7 } from 'json-schema';
-import type { DataNode } from '@dastardly/core';
+import type { DataNode } from '@bakes/dastardly-core';
 import type { KeywordValidator } from '../compiler-types.js';
 
 /**

@@ -1,4 +1,4 @@
-# @dastardly/validation
+# @bakes/dastardly-validation
 
 JSON Schema validator for dASTardly ASTs with comprehensive Draft 7 support.
 
@@ -16,14 +16,14 @@ JSON Schema validator for dASTardly ASTs with comprehensive Draft 7 support.
 ## Installation
 
 ```bash
-pnpm add @dastardly/validation
+pnpm add @bakes/dastardly-validation
 ```
 
 ## Quick Start
 
 ```typescript
-import { json } from '@dastardly/json';
-import { Validator } from '@dastardly/validation';
+import { json } from '@bakes/dastardly-json';
+import { Validator } from '@bakes/dastardly-validation';
 
 // Define your JSON Schema
 const schema = {

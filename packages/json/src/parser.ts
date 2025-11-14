@@ -10,7 +10,7 @@ import type {
   NumberNode,
   BooleanNode,
   NullNode,
-} from '@dastardly/core';
+} from '@bakes/dastardly-core';
 import {
   documentNode,
   objectNode,
@@ -20,7 +20,7 @@ import {
   numberNode,
   booleanNode,
   nullNode,
-} from '@dastardly/core';
+} from '@bakes/dastardly-core';
 import {
   TreeSitterParser,
   type ParserRuntime,
@@ -28,7 +28,7 @@ import {
   type SyntaxNode,
   nodeToLocation,
   ParseError,
-} from '@dastardly/tree-sitter-runtime';
+} from '@bakes/dastardly-tree-sitter-runtime';
 import { unescapeString } from './utils.js';
 
 /**

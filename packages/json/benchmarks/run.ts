@@ -1,7 +1,7 @@
 /**
  * JSON Parser & Serializer Benchmarks
  *
- * Compares @dastardly/json against native JSON.parse/stringify
+ * Compares @bakes/dastardly-json against native JSON.parse/stringify
  *
  * Run with: npx tsx benchmarks/run.ts
  */
@@ -9,7 +9,7 @@
 import Benchmark from 'benchmark';
 import { json } from '../src/index.js';
 import { fixtures, printFixtureSummary, type Fixture } from './fixtures.js';
-import type { DocumentNode } from '@dastardly/core';
+import type { DocumentNode } from '@bakes/dastardly-core';
 
 // Color codes for terminal output
 const colors = {
@@ -195,7 +195,7 @@ async function main(): Promise<void> {
   console.log('║                                                               ║');
   console.log('║           JSON Parser & Serializer Benchmarks                 ║');
   console.log('║                                                               ║');
-  console.log('║  Comparing @dastardly/json vs Native JSON.parse/stringify     ║');
+  console.log('║  Comparing @bakes/dastardly-json vs Native JSON.parse/stringify     ║');
   console.log('║                                                               ║');
   console.log('╚═══════════════════════════════════════════════════════════════╝');
   console.log(colors.reset);

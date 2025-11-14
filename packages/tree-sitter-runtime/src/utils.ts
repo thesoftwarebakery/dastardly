@@ -1,6 +1,6 @@
 // Utility functions for tree-sitter integration
 
-import type { Position, SourceLocation } from '@dastardly/core';
+import type { Position, SourceLocation } from '@bakes/dastardly-core';
 import type { TreeSitterPoint, SyntaxNode } from './types.js';
 
 /**

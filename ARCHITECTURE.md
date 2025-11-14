@@ -48,7 +48,7 @@ The project was built incrementally, starting with core infrastructure and addin
                           ↕
 ┌─────────────────────────────────────────────────────────┐
 │                  Format Packages                        │
-│     (@dastardly/json, @dastardly/yaml, etc.)           │
+│     (@bakes/dastardly-json, @bakes/dastardly-yaml, etc.)           │
 │                                                         │
 │  ┌──────────────┐              ┌──────────────┐        │
 │  │   Parser     │              │  Serializer  │        │
@@ -59,7 +59,7 @@ The project was built incrementally, starting with core infrastructure and addin
 └─────────────────────────────────────────────────────────┘
                           ↕
 ┌─────────────────────────────────────────────────────────┐
-│              Core AST (@dastardly/core)                 │
+│              Core AST (@bakes/dastardly-core)                 │
 │                                                         │
 │  • AST Node Types (Object, Array, String, etc.)        │
 │  • Source Location Types (Position, Span)              │
@@ -69,7 +69,7 @@ The project was built incrementally, starting with core infrastructure and addin
                           ↕
 ┌─────────────────────────────────────────────────────────┐
 │         Tree-sitter Runtime Utilities                   │
-│       (@dastardly/tree-sitter-runtime)                  │
+│       (@bakes/dastardly-tree-sitter-runtime)                  │
 │                                                         │
 │  • Tree-sitter wrapper                                 │
 │  • CST → AST conversion helpers                        │
@@ -398,11 +398,11 @@ This enables:
 ### Package Dependencies
 
 ```
-@dastardly/json ──┐
-@dastardly/yaml ──┼──→ @dastardly/tree-sitter-runtime ──→ @dastardly/core
-@dastardly/xml  ──┤                                              ↑
-@dastardly/csv  ──┘                                              │
-@dastardly/validator ────────────────────────────────────────────┘
+@bakes/dastardly-json ──┐
+@bakes/dastardly-yaml ──┼──→ @bakes/dastardly-tree-sitter-runtime ──→ @bakes/dastardly-core
+@bakes/dastardly-xml  ──┤                                              ↑
+@bakes/dastardly-csv  ──┘                                              │
+@bakes/dastardly-validator ────────────────────────────────────────────┘
 ```
 
 ### Why Monorepo?
@@ -415,10 +415,10 @@ This enables:
 ### Package Publishing
 
 - All packages versioned together
-- Published to npm with `@dastardly/` scope
+- Published to npm with `@bakes/dastardly-` scope
 - Users can install only formats they need:
   ```bash
-  npm install @dastardly/json @dastardly/yaml
+  npm install @bakes/dastardly-json @bakes/dastardly-yaml
   ```
 
 ## Performance Characteristics
@@ -523,10 +523,10 @@ packages/format-name/
 
 ### Implementation Pattern
 
-All format packages must implement the `FormatPackage` interface from `@dastardly/core`.
+All format packages must implement the `FormatPackage` interface from `@bakes/dastardly-core`.
 
 **Parser Class**:
-- Extends `TreeSitterParser` from `@dastardly/tree-sitter-runtime`
+- Extends `TreeSitterParser` from `@bakes/dastardly-tree-sitter-runtime`
 - Implements `convertDocument(node, source): DocumentNode`
 - Uses tree-sitter CST → dASTardly AST conversion
 - Preserves source positions with `nodeToLocation()`
@@ -592,8 +592,8 @@ export interface FormatParseOptions extends BaseParseOptions {
 
 **Example Usage**:
 ```typescript
-import { json } from '@dastardly/json';
-import { yaml } from '@dastardly/yaml';
+import { json } from '@bakes/dastardly-json';
+import { yaml } from '@bakes/dastardly-yaml';
 
 // Parse JSON
 const jsonAst = json.parse('{"name": "Alice"}');

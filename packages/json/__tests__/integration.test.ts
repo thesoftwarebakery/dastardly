@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { parse, serialize } from '../src/index.js';
 import { JSONParser } from '../src/parser.js';
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
+import { NodeTreeSitterRuntime } from '@bakes/dastardly-tree-sitter-runtime';
 import JSON_LANGUAGE from 'tree-sitter-json';
 
 describe('Public API', () => {
@@ -76,10 +76,10 @@ describe('Public API', () => {
   describe('Real-world JSON', () => {
     it('parses package.json-like structure', () => {
       const json = `{
-        "name": "@dastardly/json",
+        "name": "@bakes/dastardly-json",
         "version": "0.1.0",
         "dependencies": {
-          "@dastardly/core": "workspace:*"
+          "@bakes/dastardly-core": "workspace:*"
         },
         "scripts": {
           "test": "vitest run"

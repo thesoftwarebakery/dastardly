@@ -1,5 +1,5 @@
 /**
- * Benchmarking suite comparing @dastardly/validation with AJV
+ * Benchmarking suite comparing @bakes/dastardly-validation with AJV
  *
  * Benchmarks:
  * 1. Schema compilation time
@@ -11,7 +11,7 @@
 import Benchmark from 'benchmark';
 import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
-import { json } from '@dastardly/json';
+import { json } from '@bakes/dastardly-json';
 import { Validator } from '../src/validator.js';
 import { schemas, testData } from './schemas.js';
 
@@ -214,7 +214,7 @@ function benchmarkMemory() {
 // Main execution
 async function main() {
   console.log(colors.bright + '\n📊 JSON Schema Validator Benchmarks' + colors.reset);
-  console.log(colors.cyan + 'Comparing @dastardly/validation with AJV\n' + colors.reset);
+  console.log(colors.cyan + 'Comparing @bakes/dastardly-validation with AJV\n' + colors.reset);
 
   benchmarkCompilation();
   benchmarkValidation();

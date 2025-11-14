@@ -1,5 +1,5 @@
 {
-  "name": "@dastardly/validation",
+  "name": "@bakes/dastardly-validation",
   "version": "0.1.0",
   "description": "JSON Schema validator for dASTardly ASTs",
   "type": "module",
@@ -43,11 +43,11 @@
     "access": "public"
   },
   "dependencies": {
-    "@dastardly/core": "workspace:^",
+    "@bakes/dastardly-core": "workspace:^",
     "@types/json-schema": "^7.0.15"
   },
   "devDependencies": {
-    "@dastardly/json": "workspace:^",
+    "@bakes/dastardly-json": "workspace:^",
     "@json-schema-org/tests": "^1.0.0",
     "@types/benchmark": "^2.1.5",
     "@vitest/ui": "^1.6.1",

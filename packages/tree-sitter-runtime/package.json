@@ -1,5 +1,5 @@
 {
-  "name": "@dastardly/tree-sitter-runtime",
+  "name": "@bakes/dastardly-tree-sitter-runtime",
   "version": "0.1.0",
   "description": "Tree-sitter runtime abstraction and base parser for dASTardly",
   "main": "dist/index.js",
@@ -41,7 +41,7 @@
     "access": "public"
   },
   "dependencies": {
-    "@dastardly/core": "workspace:^",
+    "@bakes/dastardly-core": "workspace:^",
     "tree-sitter": "^0.21.0"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 {
-  "name": "@dastardly/yaml",
+  "name": "@bakes/dastardly-yaml",
   "version": "0.1.0",
   "description": "YAML parser and serializer for dASTardly",
   "type": "module",
@@ -44,8 +44,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@dastardly/core": "workspace:^",
-    "@dastardly/tree-sitter-runtime": "workspace:^",
+    "@bakes/dastardly-core": "workspace:^",
+    "@bakes/dastardly-tree-sitter-runtime": "workspace:^",
     "@tree-sitter-grammars/tree-sitter-yaml": "^0.7.1",
     "tree-sitter": "^0.22.4"
   },

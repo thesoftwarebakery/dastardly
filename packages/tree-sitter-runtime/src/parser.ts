@@ -1,6 +1,6 @@
 // Base tree-sitter parser class
 
-import type { DocumentNode } from '@dastardly/core';
+import type { DocumentNode } from '@bakes/dastardly-core';
 import type { ParserRuntime, Language, SyntaxNode, ParseOptions } from './types.js';
 import { ParseError } from './errors.js';
 import { nodeToLocation, findErrorNode } from './utils.js';

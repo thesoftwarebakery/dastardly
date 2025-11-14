@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parse } from '../src/index.js';
-import type { DocumentNode, DataNode, ObjectNode, ArrayNode } from '@dastardly/core';
+import type { DocumentNode, DataNode, ObjectNode, ArrayNode } from '@bakes/dastardly-core';
 
 describe('YAML Parser', () => {
   describe('plain scalars', () => {

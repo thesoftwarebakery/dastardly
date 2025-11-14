@@ -1,5 +1,5 @@
 {
-  "name": "@dastardly/integration-tests",
+  "name": "@bakes/dastardly-integration-tests",
   "version": "0.1.0",
   "description": "Integration tests for cross-format conversion and validation",
   "private": true,
@@ -16,11 +16,11 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@dastardly/core": "workspace:^",
-    "@dastardly/csv": "workspace:^",
-    "@dastardly/json": "workspace:^",
-    "@dastardly/yaml": "workspace:^",
-    "@dastardly/tree-sitter-runtime": "workspace:^"
+    "@bakes/dastardly-core": "workspace:^",
+    "@bakes/dastardly-csv": "workspace:^",
+    "@bakes/dastardly-json": "workspace:^",
+    "@bakes/dastardly-yaml": "workspace:^",
+    "@bakes/dastardly-tree-sitter-runtime": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "^24.10.0",

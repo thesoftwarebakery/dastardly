@@ -1,20 +1,20 @@
-# @dastardly/json
+# @bakes/dastardly-json
 
 High-performance JSON parser and serializer for dASTardly, built with Tree-sitter.
 
 ## Installation
 
 ```bash
-npm install @dastardly/json @dastardly/core
+npm install @bakes/dastardly-json @bakes/dastardly-core
 ```
 
 ```bash
-pnpm add @dastardly/json @dastardly/core
+pnpm add @bakes/dastardly-json @bakes/dastardly-core
 ```
 
 ## Overview
 
-`@dastardly/json` provides a blazing-fast JSON parser and serializer that converts JSON to dASTardly's format-agnostic AST. Built on tree-sitter for real-time editor performance with full position tracking for precise error reporting.
+`@bakes/dastardly-json` provides a blazing-fast JSON parser and serializer that converts JSON to dASTardly's format-agnostic AST. Built on tree-sitter for real-time editor performance with full position tracking for precise error reporting.
 
 **Key Features:**
 - **High performance** - Tree-sitter-based parsing (36-52x faster than traditional parsers)
@@ -29,7 +29,7 @@ pnpm add @dastardly/json @dastardly/core
 ### Parsing
 
 ```typescript
-import { parse } from '@dastardly/json';
+import { parse } from '@bakes/dastardly-json';
 
 // Parse to DocumentNode (includes document wrapper)
 const doc = parse('{"name": "Alice", "age": 30}');
@@ -44,8 +44,8 @@ console.log(obj.properties[0].key.value); // 'name'
 ### Serializing
 
 ```typescript
-import { serialize } from '@dastardly/json';
-import { parse } from '@dastardly/json';
+import { serialize } from '@bakes/dastardly-json';
+import { parse } from '@bakes/dastardly-json';
 
 const doc = parse('{"name": "Alice"}');
 
@@ -63,7 +63,7 @@ const pretty = serialize(doc, { indent: 2 });
 ### Roundtrip
 
 ```typescript
-import { parse, serialize } from '@dastardly/json';
+import { parse, serialize } from '@bakes/dastardly-json';
 
 const source = '{"name": "Alice", "age": 30}';
 const doc = parse(source);
@@ -78,7 +78,7 @@ const output = serialize(doc, { indent: 2 });
 The package exports a `json` object implementing the `FormatPackage` interface:
 
 ```typescript
-import { json } from '@dastardly/json';
+import { json } from '@bakes/dastardly-json';
 
 const doc = json.parse('{"a": 1}');
 const output = json.serialize(doc);
@@ -99,7 +99,7 @@ function parse(source: string): DocumentNode;
 **Example:**
 
 ```typescript
-import { parse } from '@dastardly/json';
+import { parse } from '@bakes/dastardly-json';
 
 const doc = parse('{"key": "value"}');
 console.log(doc.type); // 'Document'
@@ -132,7 +132,7 @@ function serialize(
 **Example:**
 
 ```typescript
-import { serialize } from '@dastardly/json';
+import { serialize } from '@bakes/dastardly-json';
 
 // Compact output
 serialize(ast); // {"name":"Alice"}
@@ -175,7 +175,7 @@ interface JSONSerializeOptions {
 Every node in the AST includes position information:
 
 ```typescript
-import { parse } from '@dastardly/json';
+import { parse } from '@bakes/dastardly-json';
 
 const doc = parse('{"name": "Alice"}');
 
@@ -199,7 +199,7 @@ This enables precise error reporting and source mapping across format conversion
 If you only need the data and not the document wrapper:
 
 ```typescript
-import { parse } from '@dastardly/json';
+import { parse } from '@bakes/dastardly-json';
 
 const doc = parse('{"users": [{"name": "Alice"}, {"name": "Bob"}]}');
 
@@ -214,8 +214,8 @@ if (data.type === 'Object') {
 ### Cross-format Conversion
 
 ```typescript
-import { parse as parseJSON, serialize as serializeJSON } from '@dastardly/json';
-import { parse as parseYAML, serialize as serializeYAML } from '@dastardly/yaml';
+import { parse as parseJSON, serialize as serializeJSON } from '@bakes/dastardly-json';
+import { parse as parseYAML, serialize as serializeYAML } from '@bakes/dastardly-yaml';
 
 // JSON → YAML
 const jsonDoc = parseJSON('{"name": "Alice", "age": 30}');
@@ -235,8 +235,8 @@ const jsonOutput = serializeJSON(yamlDoc, { indent: 2 });
 ### Error Handling
 
 ```typescript
-import { parse } from '@dastardly/json';
-import { ParseError } from '@dastardly/core';
+import { parse } from '@bakes/dastardly-json';
+import { ParseError } from '@bakes/dastardly-core';
 
 try {
   const doc = parse('{invalid json}');
@@ -253,7 +253,7 @@ try {
 The parser handles all JSON edge cases correctly:
 
 ```typescript
-import { parse } from '@dastardly/json';
+import { parse } from '@bakes/dastardly-json';
 
 // Empty structures
 parse('{}'); // Empty object
@@ -275,9 +275,9 @@ parse('  {  "key"  :  "value"  }  ');
 
 ## Related Packages
 
-- **[@dastardly/core](../core)** - Core AST types and utilities
-- **[@dastardly/yaml](../yaml)** - YAML parser and serializer
-- **[@dastardly/csv](../csv)** - CSV parser and serializer
+- **[@bakes/dastardly-core](../core)** - Core AST types and utilities
+- **[@bakes/dastardly-yaml](../yaml)** - YAML parser and serializer
+- **[@bakes/dastardly-csv](../csv)** - CSV parser and serializer
 
 ## License
 

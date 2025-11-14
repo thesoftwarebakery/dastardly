@@ -1,20 +1,20 @@
-# @dastardly/csv
+# @bakes/dastardly-csv
 
 High-performance CSV/TSV/PSV parser and serializer for dASTardly, built with Tree-sitter.
 
 ## Installation
 
 ```bash
-npm install @dastardly/csv @dastardly/core
+npm install @bakes/dastardly-csv @bakes/dastardly-core
 ```
 
 ```bash
-pnpm add @dastardly/csv @dastardly/core
+pnpm add @bakes/dastardly-csv @bakes/dastardly-core
 ```
 
 ## Overview
 
-`@dastardly/csv` provides a blazing-fast CSV parser and serializer that converts CSV to dASTardly's format-agnostic AST. Built on tree-sitter for real-time editor performance with full position tracking for precise error reporting.
+`@bakes/dastardly-csv` provides a blazing-fast CSV parser and serializer that converts CSV to dASTardly's format-agnostic AST. Built on tree-sitter for real-time editor performance with full position tracking for precise error reporting.
 
 **Key Features:**
 - **High performance** - Tree-sitter-based parsing for real-time editor feedback
@@ -31,7 +31,7 @@ pnpm add @dastardly/csv @dastardly/core
 ### Parsing
 
 ```typescript
-import { parse } from '@dastardly/csv';
+import { parse } from '@bakes/dastardly-csv';
 
 // Parse CSV with headers to DocumentNode
 const doc = parse('name,age\nAlice,30\nBob,25');
@@ -49,7 +49,7 @@ if (data.type === 'Array') {
 ### Serializing
 
 ```typescript
-import { serialize } from '@dastardly/csv';
+import { serialize } from '@bakes/dastardly-csv';
 
 // Serialize with default options (comma delimiter, auto-headers)
 const csv = serialize(doc);
@@ -73,7 +73,7 @@ const quoted = serialize(doc, { quoting: 'all' });
 ### Roundtrip
 
 ```typescript
-import { parse, serialize } from '@dastardly/csv';
+import { parse, serialize } from '@bakes/dastardly-csv';
 
 const source = 'name,age\nAlice,30\nBob,25';
 const doc = parse(source);
@@ -88,7 +88,7 @@ const output = serialize(doc);
 The package exports a `csv` object implementing the `FormatPackage` interface:
 
 ```typescript
-import { csv } from '@dastardly/csv';
+import { csv } from '@bakes/dastardly-csv';
 
 const doc = csv.parse('name,age\nAlice,30', { inferTypes: true });
 const output = csv.serialize(doc, { delimiter: '\t' });
@@ -122,7 +122,7 @@ function parse(
 **Example:**
 
 ```typescript
-import { parse } from '@dastardly/csv';
+import { parse } from '@bakes/dastardly-csv';
 
 // Basic parsing with headers
 const doc1 = parse('name,age\nAlice,30');
@@ -170,7 +170,7 @@ function serialize(
 **Example:**
 
 ```typescript
-import { serialize } from '@dastardly/csv';
+import { serialize } from '@bakes/dastardly-csv';
 
 // Default: comma-separated with auto-headers
 serialize(doc);
@@ -266,7 +266,7 @@ interface CSVSerializeOptions {
 Every node in the AST includes position information:
 
 ```typescript
-import { parse } from '@dastardly/csv';
+import { parse } from '@bakes/dastardly-csv';
 
 const doc = parse('name,age\nAlice,30');
 
@@ -291,7 +291,7 @@ if (data.type === 'Array' && data.elements[0]?.type === 'Object') {
 ### Type Inference
 
 ```typescript
-import { parse } from '@dastardly/csv';
+import { parse } from '@bakes/dastardly-csv';
 
 const doc = parse('name,age,active\nAlice,30,true', { inferTypes: true });
 
@@ -306,7 +306,7 @@ if (data.type === 'Array' && data.elements[0]?.type === 'Object') {
 ### Headerless CSV (Array of Arrays)
 
 ```typescript
-import { parse, serialize } from '@dastardly/csv';
+import { parse, serialize } from '@bakes/dastardly-csv';
 
 // Parse without headers
 const doc = parse('Alice,30\nBob,25', { headers: false });
@@ -326,7 +326,7 @@ const output = serialize(doc, { headers: false });
 ### Custom Headers
 
 ```typescript
-import { parse, serialize } from '@dastardly/csv';
+import { parse, serialize } from '@bakes/dastardly-csv';
 
 // Parse with custom headers (source has no header row)
 const doc = parse('Alice,30\nBob,25', {
@@ -345,8 +345,8 @@ const output = serialize(doc, {
 ### Cross-format Conversion
 
 ```typescript
-import { parse as parseCSV, serialize as serializeCSV } from '@dastardly/csv';
-import { parse as parseJSON, serialize as serializeJSON } from '@dastardly/json';
+import { parse as parseCSV, serialize as serializeCSV } from '@bakes/dastardly-csv';
+import { parse as parseJSON, serialize as serializeJSON } from '@bakes/dastardly-json';
 
 // CSV → JSON
 const csvDoc = parseCSV('name,age\nAlice,30\nBob,25');
@@ -369,8 +369,8 @@ const csvOutput = serializeCSV(jsonDoc);
 ### Error Handling
 
 ```typescript
-import { parse } from '@dastardly/csv';
-import { ParseError } from '@dastardly/core';
+import { parse } from '@bakes/dastardly-csv';
+import { ParseError } from '@bakes/dastardly-core';
 
 try {
   // Malformed CSV (unclosed quote)
@@ -387,7 +387,7 @@ try {
 ### Empty Fields
 
 ```typescript
-import { parse } from '@dastardly/csv';
+import { parse } from '@bakes/dastardly-csv';
 
 // Empty fields become empty strings
 const doc = parse('name,age\nAlice,\n,30');
@@ -397,7 +397,7 @@ const doc = parse('name,age\nAlice,\n,30');
 ### Special Characters
 
 ```typescript
-import { parse, serialize } from '@dastardly/csv';
+import { parse, serialize } from '@bakes/dastardly-csv';
 
 // Fields with commas are quoted automatically
 const doc = parse('name,location\n"Alice","New York, NY"');
@@ -410,7 +410,7 @@ const doc2 = parse('quote\n"She said ""hello"""');
 ### Large Numbers
 
 ```typescript
-import { parse } from '@dastardly/csv';
+import { parse } from '@bakes/dastardly-csv';
 
 // With type inference, numbers are parsed as numbers
 const doc = parse('id\n9007199254740991', { inferTypes: true });
@@ -429,9 +429,9 @@ const doc2 = parse('id\n9007199254740991');
 
 ## Related Packages
 
-- **[@dastardly/core](../core)** - Core AST types and utilities
-- **[@dastardly/json](../json)** - JSON parser and serializer
-- **[@dastardly/yaml](../yaml)** - YAML parser and serializer
+- **[@bakes/dastardly-core](../core)** - Core AST types and utilities
+- **[@bakes/dastardly-json](../json)** - JSON parser and serializer
+- **[@bakes/dastardly-yaml](../yaml)** - YAML parser and serializer
 
 ## License
 

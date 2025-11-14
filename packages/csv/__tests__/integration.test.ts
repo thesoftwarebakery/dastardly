@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { parse, serialize } from '../src/index.js';
 import { CSVParser } from '../src/parser.js';
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
-import CSV_LANGUAGE from '@dastardly/tree-sitter-csv';
+import { NodeTreeSitterRuntime } from '@bakes/dastardly-tree-sitter-runtime';
+import CSV_LANGUAGE from '@bakes/dastardly-tree-sitter-csv';
 
 describe('Public API', () => {
   describe('parse()', () => {

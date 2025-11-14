@@ -1,5 +1,5 @@
-import type { DataNode, ArrayNode, ObjectNode, PropertyNode } from '@dastardly/core';
-import { isArrayNode, isObjectNode, isStringNode, propertyNode, stringNode, objectNode } from '@dastardly/core';
+import type { DataNode, ArrayNode, ObjectNode, PropertyNode } from '@bakes/dastardly-core';
+import { isArrayNode, isObjectNode, isStringNode, propertyNode, stringNode, objectNode } from '@bakes/dastardly-core';
 import { needsQuoting, normalizeLineEnding, type QuoteStrategy } from './utils.js';
 
 export interface CSVSerializeOptions {

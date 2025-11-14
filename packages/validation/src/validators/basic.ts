@@ -78,7 +78,7 @@ export function createConstValidator(constValue: unknown): KeywordValidator {
 /**
  * Extract plain JavaScript value from AST node for comparison
  */
-function extractValue(node: import('@dastardly/core').DataNode): unknown {
+function extractValue(node: import('@bakes/dastardly-core').DataNode): unknown {
   switch (node.type) {
     case 'String':
       return node.value;

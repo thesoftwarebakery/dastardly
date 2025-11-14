@@ -1,5 +1,5 @@
 {
-  "name": "@dastardly/tree-sitter-csv",
+  "name": "@bakes/dastardly-tree-sitter-csv",
   "version": "1.2.0",
   "description": "CSV, PSV, & TSV grammar for tree-sitter (dASTardly fork with prebuilt binaries)",
   "main": "bindings/node",

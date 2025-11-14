@@ -1,7 +1,7 @@
 /**
  * YAML Parser & Serializer Benchmarks
  *
- * Compares @dastardly/yaml against js-yaml
+ * Compares @bakes/dastardly-yaml against js-yaml
  *
  * Run with: npx tsx benchmarks/run.ts
  */
@@ -9,7 +9,7 @@
 import Benchmark from 'benchmark';
 import { yaml } from '../src/index.js';
 import { fixtures, printFixtureSummary, type Fixture } from './fixtures.js';
-import type { DocumentNode } from '@dastardly/core';
+import type { DocumentNode } from '@bakes/dastardly-core';
 import * as jsYaml from 'js-yaml';
 
 // Color codes for terminal output
@@ -196,7 +196,7 @@ async function main(): Promise<void> {
   console.log('║                                                               ║');
   console.log('║          YAML Parser & Serializer Benchmarks                  ║');
   console.log('║                                                               ║');
-  console.log('║         Comparing @dastardly/yaml vs js-yaml                  ║');
+  console.log('║         Comparing @bakes/dastardly-yaml vs js-yaml                  ║');
   console.log('║                                                               ║');
   console.log('╚═══════════════════════════════════════════════════════════════╝');
   console.log(colors.reset);

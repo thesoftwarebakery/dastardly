@@ -3,7 +3,7 @@
  */
 
 import type { JSONSchema7Definition } from 'json-schema';
-import type { DataNode } from '@dastardly/core';
+import type { DataNode } from '@bakes/dastardly-core';
 import type { ValidationContext } from '../compiler-types.js';
 import type { ValidationError } from '../types.js';
 import { SchemaCompiler } from '../compiler.js';

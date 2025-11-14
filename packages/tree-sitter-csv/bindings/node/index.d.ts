@@ -1,4 +1,4 @@
-// Type definitions for @dastardly/tree-sitter-csv
+// Type definitions for @bakes/dastardly-tree-sitter-csv
 
 // Wrapper objects containing tree-sitter language
 // tree-sitter will add nodeTypeInfo and nodeSubclasses to these wrappers

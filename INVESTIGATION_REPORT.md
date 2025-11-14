@@ -243,7 +243,7 @@ All measurements on typical developer hardware (no performance regression).
 
 ### New APIs
 ```typescript
-// New type exported from @dastardly/tree-sitter-runtime
+// New type exported from @bakes/dastardly-tree-sitter-runtime
 export interface ParseOptions {
   bufferSize?: number;
   includedRanges?: Range[];
@@ -328,7 +328,7 @@ cd packages/json && pnpm test                  # 140/140 ✅
 
 # Large file parsing works
 node -e "
-  const { json } = require('@dastardly/json');
+  const { json } = require('@bakes/dastardly-json');
   const data = { items: Array(10000).fill({ id: 1, name: 'test' }) };
   const source = JSON.stringify(data); // ~400KB
   console.log('Parsing', source.length, 'bytes...');

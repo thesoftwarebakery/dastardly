@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parseCSV } from '../src/parser.js';
-import { isArrayNode, isObjectNode, isStringNode, isNumberNode } from '@dastardly/core';
+import { isArrayNode, isObjectNode, isStringNode, isNumberNode } from '@bakes/dastardly-core';
 
 describe('CSV Parser', () => {
   describe('Basic parsing with headers', () => {

@@ -1,9 +1,9 @@
-// @dastardly/csv - CSV parser and serializer
+// @bakes/dastardly-csv - CSV parser and serializer
 
-import type { DocumentNode, DataNode, FormatPackage } from '@dastardly/core';
-import { isDocumentNode } from '@dastardly/core';
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
-import CSV_LANGUAGE from '@dastardly/tree-sitter-csv';
+import type { DocumentNode, DataNode, FormatPackage } from '@bakes/dastardly-core';
+import { isDocumentNode } from '@bakes/dastardly-core';
+import { NodeTreeSitterRuntime } from '@bakes/dastardly-tree-sitter-runtime';
+import CSV_LANGUAGE from '@bakes/dastardly-tree-sitter-csv';
 
 // Export public types
 export type { CSVParseOptions } from './parser.js';
@@ -21,7 +21,7 @@ import { serialize as serializeNode, type CSVSerializeOptions } from './serializ
  *
  * @example
  * ```typescript
- * import { csv } from '@dastardly/csv';
+ * import { csv } from '@bakes/dastardly-csv';
  *
  * // Parse CSV with headers
  * const ast = csv.parse('name,age\nAlice,30\nBob,25');

@@ -1,6 +1,6 @@
 // Validation result types
 
-import type { SourceLocation } from '@dastardly/core';
+import type { SourceLocation } from '@bakes/dastardly-core';
 
 /**
  * Validation error with source location

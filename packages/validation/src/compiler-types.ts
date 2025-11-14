@@ -1,7 +1,7 @@
 // Compiler types and interfaces for schema compilation
 
 import type { JSONSchema7 } from 'json-schema';
-import type { DataNode, NodeIdentity } from '@dastardly/core';
+import type { DataNode, NodeIdentity } from '@bakes/dastardly-core';
 import type { ValidationError } from './types.js';
 
 /**

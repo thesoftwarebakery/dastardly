@@ -1,20 +1,20 @@
-# @dastardly/yaml
+# @bakes/dastardly-yaml
 
 High-performance YAML parser and serializer for dASTardly, built with Tree-sitter.
 
 ## Installation
 
 ```bash
-npm install @dastardly/yaml @dastardly/core
+npm install @bakes/dastardly-yaml @bakes/dastardly-core
 ```
 
 ```bash
-pnpm add @dastardly/yaml @dastardly/core
+pnpm add @bakes/dastardly-yaml @bakes/dastardly-core
 ```
 
 ## Overview
 
-`@dastardly/yaml` provides a blazing-fast YAML 1.2 parser and serializer that converts YAML to dASTardly's format-agnostic AST. Built on tree-sitter for real-time editor performance with full position tracking for precise error reporting.
+`@bakes/dastardly-yaml` provides a blazing-fast YAML 1.2 parser and serializer that converts YAML to dASTardly's format-agnostic AST. Built on tree-sitter for real-time editor performance with full position tracking for precise error reporting.
 
 **Key Features:**
 - **High performance** - Tree-sitter-based parsing (36-52x faster than traditional parsers)
@@ -29,7 +29,7 @@ pnpm add @dastardly/yaml @dastardly/core
 ### Parsing
 
 ```typescript
-import { parse } from '@dastardly/yaml';
+import { parse } from '@bakes/dastardly-yaml';
 
 // Parse to DocumentNode (includes document wrapper)
 const doc = parse('name: Alice\nage: 30');
@@ -44,8 +44,8 @@ console.log(obj.properties[0].key.value); // 'name'
 ### Serializing
 
 ```typescript
-import { serialize } from '@dastardly/yaml';
-import { parse } from '@dastardly/yaml';
+import { serialize } from '@bakes/dastardly-yaml';
+import { parse } from '@bakes/dastardly-yaml';
 
 const doc = parse('name: Alice');
 
@@ -64,7 +64,7 @@ const indented = serialize(doc, { indent: 4 });
 ### Roundtrip
 
 ```typescript
-import { parse, serialize } from '@dastardly/yaml';
+import { parse, serialize } from '@bakes/dastardly-yaml';
 
 const source = 'name: Alice\nage: 30';
 const doc = parse(source);
@@ -79,7 +79,7 @@ const output = serialize(doc);
 The package exports a `yaml` object implementing the `FormatPackage` interface:
 
 ```typescript
-import { yaml } from '@dastardly/yaml';
+import { yaml } from '@bakes/dastardly-yaml';
 
 const doc = yaml.parse('name: Alice');
 const output = yaml.serialize(doc);
@@ -107,7 +107,7 @@ function parse(source: string): DocumentNode;
 **Example:**
 
 ```typescript
-import { parse } from '@dastardly/yaml';
+import { parse } from '@bakes/dastardly-yaml';
 
 // Simple object
 const doc1 = parse('name: Alice\nage: 30');
@@ -148,7 +148,7 @@ function serialize(
 **Example:**
 
 ```typescript
-import { serialize } from '@dastardly/yaml';
+import { serialize } from '@bakes/dastardly-yaml';
 
 // Block style (default, human-readable)
 serialize(doc);
@@ -173,7 +173,7 @@ serialize(doc, { indent: 4 });
 YAML anchors (`&`) and aliases (`*`) allow you to reuse node values:
 
 ```typescript
-import { parse, serialize } from '@dastardly/yaml';
+import { parse, serialize } from '@bakes/dastardly-yaml';
 
 const source = `
 defaults: &defaults
@@ -292,8 +292,8 @@ interface YAMLSerializeOptions extends BaseSerializeOptions {
 Convert between YAML and other formats using dASTardly's common AST:
 
 ```typescript
-import { parse as parseYAML, serialize as serializeYAML } from '@dastardly/yaml';
-import { serialize as serializeJSON } from '@dastardly/json';
+import { parse as parseYAML, serialize as serializeYAML } from '@bakes/dastardly-yaml';
+import { serialize as serializeJSON } from '@bakes/dastardly-json';
 
 // YAML to JSON
 const yamlSource = 'name: Alice\nage: 30';
@@ -305,7 +305,7 @@ const jsonOutput = serializeJSON(doc, { indent: 2 });
 // }
 
 // JSON to YAML
-import { parse as parseJSON } from '@dastardly/json';
+import { parse as parseJSON } from '@bakes/dastardly-json';
 const jsonSource = '{"name": "Alice", "age": 30}';
 const doc2 = parseJSON(jsonSource);
 const yamlOutput = serializeYAML(doc2);
@@ -324,10 +324,10 @@ See [benchmarks/README.md](./benchmarks/README.md) for detailed performance comp
 
 ## Related Packages
 
-- [`@dastardly/core`](https://npmjs.com/package/@dastardly/core) - Core AST types
-- [`@dastardly/json`](https://npmjs.com/package/@dastardly/json) - JSON parser/serializer
-- [`@dastardly/csv`](https://npmjs.com/package/@dastardly/csv) - CSV parser/serializer
-- [`@dastardly/validation`](https://npmjs.com/package/@dastardly/validation) - JSON Schema validator
+- [`@bakes/dastardly-core`](https://npmjs.com/package/@bakes/dastardly-core) - Core AST types
+- [`@bakes/dastardly-json`](https://npmjs.com/package/@bakes/dastardly-json) - JSON parser/serializer
+- [`@bakes/dastardly-csv`](https://npmjs.com/package/@bakes/dastardly-csv) - CSV parser/serializer
+- [`@bakes/dastardly-validation`](https://npmjs.com/package/@bakes/dastardly-validation) - JSON Schema validator
 
 ## License
 

@@ -1,6 +1,6 @@
 # YAML Parser & Serializer Benchmarks
 
-Comprehensive performance benchmarking of `@dastardly/yaml` against `js-yaml`.
+Comprehensive performance benchmarking of `@bakes/dastardly-yaml` against `js-yaml`.
 
 ## Running Benchmarks
 

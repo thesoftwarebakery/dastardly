@@ -1,20 +1,20 @@
-# @dastardly/tree-sitter-runtime
+# @bakes/dastardly-tree-sitter-runtime
 
 Tree-sitter runtime abstraction and base parser for dASTardly.
 
 ## Installation
 
 ```bash
-npm install @dastardly/tree-sitter-runtime
+npm install @bakes/dastardly-tree-sitter-runtime
 ```
 
 ```bash
-pnpm add @dastardly/tree-sitter-runtime
+pnpm add @bakes/dastardly-tree-sitter-runtime
 ```
 
 ## Overview
 
-`@dastardly/tree-sitter-runtime` provides an abstraction layer over tree-sitter parsers, making it easy to build format-specific parsers that convert tree-sitter's Concrete Syntax Tree (CST) to dASTardly's Abstract Syntax Tree (AST).
+`@bakes/dastardly-tree-sitter-runtime` provides an abstraction layer over tree-sitter parsers, making it easy to build format-specific parsers that convert tree-sitter's Concrete Syntax Tree (CST) to dASTardly's Abstract Syntax Tree (AST).
 
 **Key Features:**
 - **Runtime abstraction** - Works with both Node.js tree-sitter and web-tree-sitter (WASM)
@@ -39,8 +39,8 @@ import {
   type ParserRuntime,
   type Language,
   nodeToLocation,
-} from '@dastardly/tree-sitter-runtime';
-import { documentNode, stringNode } from '@dastardly/core';
+} from '@bakes/dastardly-tree-sitter-runtime';
+import { documentNode, stringNode } from '@bakes/dastardly-core';
 import MY_LANGUAGE from 'tree-sitter-my-format';
 
 export class MyFormatParser extends TreeSitterParser {
@@ -77,7 +77,7 @@ const ast = parser.parse('source code here');
 Runtime implementation for Node.js using the native tree-sitter binding:
 
 ```typescript
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
+import { NodeTreeSitterRuntime } from '@bakes/dastardly-tree-sitter-runtime';
 
 const runtime = new NodeTreeSitterRuntime();
 ```
@@ -182,7 +182,7 @@ interface ParserRuntime {
 Convert tree-sitter node to dASTardly SourceLocation:
 
 ```typescript
-import { nodeToLocation } from '@dastardly/tree-sitter-runtime';
+import { nodeToLocation } from '@bakes/dastardly-tree-sitter-runtime';
 
 const loc = nodeToLocation(syntaxNode, 'json');
 // Returns: SourceLocation with line, column, offset
@@ -193,7 +193,7 @@ const loc = nodeToLocation(syntaxNode, 'json');
 Convert tree-sitter point to dASTardly Position:
 
 ```typescript
-import { pointToPosition } from '@dastardly/tree-sitter-runtime';
+import { pointToPosition } from '@bakes/dastardly-tree-sitter-runtime';
 
 const pos = pointToPosition(
   { row: 0, column: 5 },
@@ -208,7 +208,7 @@ const pos = pointToPosition(
 Check if a node or its descendants have errors:
 
 ```typescript
-import { hasError } from '@dastardly/tree-sitter-runtime';
+import { hasError } from '@bakes/dastardly-tree-sitter-runtime';
 
 if (hasError(tree.rootNode)) {
   console.error('Parse errors detected');
@@ -220,7 +220,7 @@ if (hasError(tree.rootNode)) {
 Find the first error node in the tree:
 
 ```typescript
-import { findErrorNode } from '@dastardly/tree-sitter-runtime';
+import { findErrorNode } from '@bakes/dastardly-tree-sitter-runtime';
 
 const errorNode = findErrorNode(tree.rootNode);
 if (errorNode) {
@@ -247,7 +247,7 @@ class ParseError extends Error {
 **Usage:**
 
 ```typescript
-import { ParseError, nodeToLocation } from '@dastardly/tree-sitter-runtime';
+import { ParseError, nodeToLocation } from '@bakes/dastardly-tree-sitter-runtime';
 
 if (tree.rootNode.hasError()) {
   throw new ParseError(
@@ -273,7 +273,7 @@ import {
   type Language,
   nodeToLocation,
   ParseError,
-} from '@dastardly/tree-sitter-runtime';
+} from '@bakes/dastardly-tree-sitter-runtime';
 import {
   documentNode,
   objectNode,
@@ -282,7 +282,7 @@ import {
   numberNode,
   propertyNode,
   type PropertyNode,
-} from '@dastardly/core';
+} from '@bakes/dastardly-core';
 import JSON_LANGUAGE from 'tree-sitter-json';
 
 export class JSONParser extends TreeSitterParser {
@@ -359,7 +359,7 @@ export class JSONParser extends TreeSitterParser {
 ### Using the Parser
 
 ```typescript
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
+import { NodeTreeSitterRuntime } from '@bakes/dastardly-tree-sitter-runtime';
 import { JSONParser } from './json-parser';
 import JSON_LANGUAGE from 'tree-sitter-json';
 
@@ -394,7 +394,7 @@ const doc3 = parser.parse('{"c": 3}');
 ### Error Handling
 
 ```typescript
-import { ParseError, hasError, findErrorNode } from '@dastardly/tree-sitter-runtime';
+import { ParseError, hasError, findErrorNode } from '@bakes/dastardly-tree-sitter-runtime';
 
 const tree = runtime.parse(source);
 
@@ -470,9 +470,9 @@ const doc = parser.parseIncremental(newSource, edit);
 
 ## Related Packages
 
-- **[@dastardly/core](https://www.npmjs.com/package/@dastardly/core)** - Core AST types
-- **[@dastardly/json](https://www.npmjs.com/package/@dastardly/json)** - JSON parser using this runtime
-- **[@dastardly/yaml](https://www.npmjs.com/package/@dastardly/yaml)** - YAML parser (coming soon)
+- **[@bakes/dastardly-core](https://www.npmjs.com/package/@bakes/dastardly-core)** - Core AST types
+- **[@bakes/dastardly-json](https://www.npmjs.com/package/@bakes/dastardly-json)** - JSON parser using this runtime
+- **[@bakes/dastardly-yaml](https://www.npmjs.com/package/@bakes/dastardly-yaml)** - YAML parser (coming soon)
 
 ## Documentation
 

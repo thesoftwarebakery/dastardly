@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { JSONParser } from '../src/parser.js';
-import { NodeTreeSitterRuntime, ParseError } from '@dastardly/tree-sitter-runtime';
+import { NodeTreeSitterRuntime, ParseError } from '@bakes/dastardly-tree-sitter-runtime';
 import JSON_LANGUAGE from 'tree-sitter-json';
 
 describe('JSONParser', () => {

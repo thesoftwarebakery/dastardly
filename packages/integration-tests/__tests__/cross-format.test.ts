@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { parse as parseJSON, serialize as serializeJSON } from '@dastardly/json';
-import { parse as parseYAML, serialize as serializeYAML } from '@dastardly/yaml';
-import { parse as parseCSV, serialize as serializeCSV } from '@dastardly/csv';
-import { toNative } from '@dastardly/core';
+import { parse as parseJSON, serialize as serializeJSON } from '@bakes/dastardly-json';
+import { parse as parseYAML, serialize as serializeYAML } from '@bakes/dastardly-yaml';
+import { parse as parseCSV, serialize as serializeCSV } from '@bakes/dastardly-csv';
+import { toNative } from '@bakes/dastardly-core';
 import { loadJSONFixture, loadYAMLFixture, loadCSVFixture } from './helpers/fixtures.js';
 
 describe('Cross-format conversions: JSON ↔ YAML', () => {

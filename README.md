@@ -29,11 +29,11 @@ Each package has comprehensive unit tests covering parsers, serializers, and uti
 pnpm -r test
 
 # Test specific package
-pnpm --filter @dastardly/json test
-pnpm --filter @dastardly/yaml test
+pnpm --filter @bakes/dastardly-json test
+pnpm --filter @bakes/dastardly-yaml test
 
 # Watch mode
-pnpm --filter @dastardly/core test:watch
+pnpm --filter @bakes/dastardly-core test:watch
 ```
 
 ### Integration Tests
@@ -42,7 +42,7 @@ Cross-format integration tests validate end-to-end functionality:
 
 ```bash
 # Run integration tests
-pnpm --filter @dastardly/integration-tests test
+pnpm --filter @bakes/dastardly-integration-tests test
 
 # All tests (unit + integration)
 pnpm -r test

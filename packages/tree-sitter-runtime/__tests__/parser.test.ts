@@ -6,8 +6,8 @@ import {
   nodeToLocation,
 } from '../src/index.js';
 import type { SyntaxNode } from '../src/index.js';
-import { documentNode, stringNode, numberNode, objectNode, propertyNode } from '@dastardly/core';
-import type { DocumentNode } from '@dastardly/core';
+import { documentNode, stringNode, numberNode, objectNode, propertyNode } from '@bakes/dastardly-core';
+import type { DocumentNode } from '@bakes/dastardly-core';
 import JSON from 'tree-sitter-json';
 
 // Mock JSON parser for testing

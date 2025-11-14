@@ -11,18 +11,18 @@ import {
   booleanNode,
   nullNode,
   propertyNode,
-} from '@dastardly/core';
+} from '@bakes/dastardly-core';
 import {
   TreeSitterParser,
   type ParserRuntime,
   type SyntaxNode,
   nodeToLocation,
-} from '@dastardly/tree-sitter-runtime';
+} from '@bakes/dastardly-tree-sitter-runtime';
 import { unescapeField } from './utils.js';
 
 // Import the grammars (wrapper objects containing .language)
-import type { LanguageWrapper } from '@dastardly/tree-sitter-csv';
-import * as csvGrammars from '@dastardly/tree-sitter-csv';
+import type { LanguageWrapper } from '@bakes/dastardly-tree-sitter-csv';
+import * as csvGrammars from '@bakes/dastardly-tree-sitter-csv';
 
 export interface CSVParseOptions extends BaseParseOptions {
   /**
@@ -316,7 +316,7 @@ export function parseCSV(source: string, options: CSVParseOptions = {}): CSVPars
   const grammar = selectGrammar(delimiter);
 
   // Import runtime here to avoid circular dependencies
-  const { NodeTreeSitterRuntime } = require('@dastardly/tree-sitter-runtime');
+  const { NodeTreeSitterRuntime } = require('@bakes/dastardly-tree-sitter-runtime');
   const runtime = new NodeTreeSitterRuntime();
 
   const parser = new CSVParser(runtime, grammar, options);

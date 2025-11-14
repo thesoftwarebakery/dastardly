@@ -1,6 +1,6 @@
 # Validation Benchmarks
 
-Comprehensive performance benchmarks comparing `@dastardly/validation` with AJV (the industry-standard JSON Schema validator).
+Comprehensive performance benchmarks comparing `@bakes/dastardly-validation` with AJV (the industry-standard JSON Schema validator).
 
 ## Running Benchmarks
 

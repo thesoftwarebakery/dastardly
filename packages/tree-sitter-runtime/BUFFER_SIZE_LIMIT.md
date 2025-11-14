@@ -63,7 +63,7 @@ const tree = runtime.parse(largeJsonString); // No error, even for 1MB+ files
 For advanced use cases, you can still manually specify the buffer size:
 
 ```typescript
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
+import { NodeTreeSitterRuntime } from '@bakes/dastardly-tree-sitter-runtime';
 
 const runtime = new NodeTreeSitterRuntime();
 runtime.setLanguage(JsonLanguage);
@@ -152,7 +152,7 @@ Minimal to none:
 
 ### Basic Usage (Automatic)
 ```typescript
-import { json } from '@dastardly/json';
+import { json } from '@bakes/dastardly-json';
 
 // This now works for files of any size!
 const largeJson = fs.readFileSync('huge-file.json', 'utf-8'); // 1MB+
@@ -161,7 +161,7 @@ const ast = json.parse(largeJson);
 
 ### Advanced Usage (Manual Control)
 ```typescript
-import { NodeTreeSitterRuntime, ParseOptions } from '@dastardly/tree-sitter-runtime';
+import { NodeTreeSitterRuntime, ParseOptions } from '@bakes/dastardly-tree-sitter-runtime';
 import JsonLanguage from 'tree-sitter-json';
 
 const runtime = new NodeTreeSitterRuntime();

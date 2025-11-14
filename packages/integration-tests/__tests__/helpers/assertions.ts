@@ -1,6 +1,6 @@
 import { expect } from 'vitest';
-import type { ASTNode, Position, SourceLocation } from '@dastardly/core';
-import { toNative } from '@dastardly/core';
+import type { ASTNode, Position, SourceLocation } from '@bakes/dastardly-core';
+import { toNative } from '@bakes/dastardly-core';
 
 /**
  * Assert that two AST nodes are structurally equal (ignoring position information)

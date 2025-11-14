@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { serialize } from '../src/serializer.js';
 import { parseCSV } from '../src/parser.js';
-import { arrayNode, objectNode, propertyNode, stringNode, numberNode, booleanNode } from '@dastardly/core';
+import { arrayNode, objectNode, propertyNode, stringNode, numberNode, booleanNode } from '@bakes/dastardly-core';
 
 describe('CSV Serializer Edge Cases (from integration tests)', () => {
   describe('Field quoting', () => {

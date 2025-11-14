@@ -38,7 +38,7 @@ This project has several documentation files, each serving a specific purpose:
 ### Monorepo Structure (pnpm)
 - **Package Manager**: pnpm (already configured)
 - **Workspaces**: Each format parser/serializer is a separate package
-- **Core Package**: `@dastardly/core` contains shared AST types
+- **Core Package**: `@bakes/dastardly-core` contains shared AST types
 
 ```
 dastardly/
@@ -83,7 +83,7 @@ The core defines:
   - `exactOptionalPropertyTypes: true`
 
 ### Naming Conventions
-- **Packages**: `@dastardly/package-name`
+- **Packages**: `@bakes/dastardly-package-name`
 - **Classes**: PascalCase with "Dastardly" prefix for core types (e.g., `DastardlyNode`)
 - **Interfaces**: PascalCase
 - **Files**: kebab-case for TypeScript files
@@ -108,7 +108,7 @@ The core defines:
 pnpm -r build
 
 # Build specific package
-pnpm --filter @dastardly/core build
+pnpm --filter @bakes/dastardly-core build
 ```
 
 ### Testing
@@ -117,7 +117,7 @@ pnpm --filter @dastardly/core build
 pnpm -r test
 
 # Test specific package
-pnpm --filter @dastardly/json test
+pnpm --filter @bakes/dastardly-json test
 ```
 
 ## Implementing New Format Packages
@@ -187,7 +187,7 @@ export type { FormatSerializeOptions, FormatParseOptions };
 6. **Documentation**: Keep docs in sync with code changes
 
 ### Before Adding Code:
-1. Check if it belongs in `@dastardly/core` (shared) or format-specific package
+1. Check if it belongs in `@bakes/dastardly-core` (shared) or format-specific package
 2. Ensure TypeScript strict mode compliance
 3. Add position tracking to any new AST nodes
 4. Consider how it affects cross-format conversion
@@ -212,7 +212,7 @@ export type { FormatSerializeOptions, FormatParseOptions };
 - [Tree-sitter Documentation](https://tree-sitter.github.io/tree-sitter/)
 - [tree-sitter-json](https://github.com/tree-sitter/tree-sitter-json)
 - [tree-sitter-yaml](https://github.com/ikatyang/tree-sitter-yaml)
-- [tree-sitter-csv](https://github.com/amaanq/tree-sitter-csv) (forked as @dastardly/tree-sitter-csv)
+- [tree-sitter-csv](https://github.com/amaanq/tree-sitter-csv) (forked as @bakes/dastardly-tree-sitter-csv)
 - [JSON Specification](https://www.json.org/)
 - [YAML 1.2 Specification](https://yaml.org/spec/1.2.2/)
 - [RFC 4180 CSV Specification](https://www.rfc-editor.org/rfc/rfc4180.html)

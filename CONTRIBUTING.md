@@ -53,7 +53,7 @@ dastardly/
 pnpm -r build
 
 # Build a specific package
-pnpm --filter @dastardly/core build
+pnpm --filter @bakes/dastardly-core build
 ```
 
 ### Testing
@@ -63,10 +63,10 @@ pnpm --filter @dastardly/core build
 pnpm -r test
 
 # Run tests for a specific package
-pnpm --filter @dastardly/json test
+pnpm --filter @bakes/dastardly-json test
 
 # Run tests in watch mode
-pnpm --filter @dastardly/json test:watch
+pnpm --filter @bakes/dastardly-json test:watch
 ```
 
 ### Code Quality
@@ -125,7 +125,7 @@ To add support for a new format:
 2. **Create package.json**:
    ```json
    {
-     "name": "@dastardly/<format-name>",
+     "name": "@bakes/dastardly-<format-name>",
      "version": "0.1.0",
      "description": "<Format> parser and serializer for dASTardly",
      "type": "module",
@@ -136,7 +136,7 @@ To add support for a new format:
        "test": "vitest"
      },
      "dependencies": {
-       "@dastardly/core": "workspace:^",
+       "@bakes/dastardly-core": "workspace:^",
        "tree-sitter": "^0.21.0"
      },
      "devDependencies": {
@@ -188,7 +188,7 @@ To add support for a new format:
 
 All dASTardly packages are versioned together using **coordinated releases**. When one package is updated, all packages receive the same version number. This ensures compatibility and simplifies the user experience.
 
-**Example**: If `@dastardly/core` moves from v0.1.0 to v0.2.0, all other packages (`@dastardly/json`, `@dastardly/tree-sitter-runtime`, etc.) also move to v0.2.0, even if they have no code changes.
+**Example**: If `@bakes/dastardly-core` moves from v0.1.0 to v0.2.0, all other packages (`@bakes/dastardly-json`, `@bakes/dastardly-tree-sitter-runtime`, etc.) also move to v0.2.0, even if they have no code changes.
 
 ### Internal Dependencies
 
@@ -197,8 +197,8 @@ Use `workspace:^` for all internal package dependencies:
 ```json
 {
   "dependencies": {
-    "@dastardly/core": "workspace:^",
-    "@dastardly/tree-sitter-runtime": "workspace:^"
+    "@bakes/dastardly-core": "workspace:^",
+    "@bakes/dastardly-tree-sitter-runtime": "workspace:^"
   }
 }
 ```
@@ -214,15 +214,15 @@ Use `workspace:^` for all internal package dependencies:
 
 ```json
 // Before publish (in monorepo)
-"@dastardly/core": "workspace:^"
+"@bakes/dastardly-core": "workspace:^"
 
 // After publish (on npm)
-"@dastardly/core": "^0.1.0"
+"@bakes/dastardly-core": "^0.1.0"
 ```
 
 **User benefits:**
 - Users can independently update packages for bug fixes
-- Example: Install `@dastardly/json@0.1.0`, later update just `@dastardly/core` to `0.1.5` for a critical fix
+- Example: Install `@bakes/dastardly-json@0.1.0`, later update just `@bakes/dastardly-core` to `0.1.5` for a critical fix
 - Version ranges prevent incompatible major version combinations
 
 ### External Dependencies
@@ -295,7 +295,7 @@ The `packages/integration-tests` package contains comprehensive tests for cross-
 
 ```bash
 # Run integration tests
-pnpm --filter @dastardly/integration-tests test
+pnpm --filter @bakes/dastardly-integration-tests test
 
 # Run all tests (including integration tests)
 pnpm -r test
@@ -559,7 +559,7 @@ function runParseBenchmarks(fixture) {
 {
   "scripts": {
     "benchmark": "... && pnpm benchmark:<format>",
-    "benchmark:<format>": "pnpm --filter @dastardly/<format> benchmark"
+    "benchmark:<format>": "pnpm --filter @bakes/dastardly-<format> benchmark"
   }
 }
 ```
@@ -637,10 +637,10 @@ This project follows [Conventional Commits](https://www.conventionalcommits.org/
 
 ### Scopes
 
-- **core**: Changes to `@dastardly/core`
-- **json**: Changes to `@dastardly/json`
-- **yaml**: Changes to `@dastardly/yaml`
-- **runtime**: Changes to `@dastardly/tree-sitter-runtime`
+- **core**: Changes to `@bakes/dastardly-core`
+- **json**: Changes to `@bakes/dastardly-json`
+- **yaml**: Changes to `@bakes/dastardly-yaml`
+- **runtime**: Changes to `@bakes/dastardly-tree-sitter-runtime`
 - **docs**: Documentation changes
 - **repo**: Repository-level changes
 

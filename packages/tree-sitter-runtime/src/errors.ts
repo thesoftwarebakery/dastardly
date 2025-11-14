@@ -1,6 +1,6 @@
 // Error classes for parsing
 
-import type { SourceLocation } from '@dastardly/core';
+import type { SourceLocation } from '@bakes/dastardly-core';
 
 /**
  * Error thrown when parsing fails.

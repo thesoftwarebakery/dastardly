@@ -1,20 +1,20 @@
-# @dastardly/core
+# @bakes/dastardly-core
 
 Core AST types and utilities for dASTardly - a high-performance, format-agnostic Abstract Syntax Tree for data interchange formats.
 
 ## Installation
 
 ```bash
-npm install @dastardly/core
+npm install @bakes/dastardly-core
 ```
 
 ```bash
-pnpm add @dastardly/core
+pnpm add @bakes/dastardly-core
 ```
 
 ## Overview
 
-`@dastardly/core` provides the foundational types and utilities for building and working with dASTardly ASTs. It defines a format-agnostic representation of structured data that can be used across JSON, YAML, XML, CSV, and other formats.
+`@bakes/dastardly-core` provides the foundational types and utilities for building and working with dASTardly ASTs. It defines a format-agnostic representation of structured data that can be used across JSON, YAML, XML, CSV, and other formats.
 
 **Key Features:**
 - **Format-agnostic AST types** - Common representation for all data formats
@@ -36,7 +36,7 @@ import {
   numberNode,
   position,
   sourceLocation,
-} from '@dastardly/core';
+} from '@bakes/dastardly-core';
 
 // Create a simple AST
 const loc = sourceLocation(
@@ -208,7 +208,7 @@ import {
   isContainerNode,
   isDocumentNode,
   isPropertyNode,
-} from '@dastardly/core';
+} from '@bakes/dastardly-core';
 
 if (isObjectNode(node)) {
   // TypeScript knows node is ObjectNode
@@ -233,7 +233,7 @@ Traverse and manipulate AST nodes using the visitor pattern:
 Visit nodes with a visitor object:
 
 ```typescript
-import { visit } from '@dastardly/core';
+import { visit } from '@bakes/dastardly-core';
 
 visit(ast, {
   String(node) {
@@ -250,7 +250,7 @@ visit(ast, {
 Traverse all nodes with a callback:
 
 ```typescript
-import { traverse } from '@dastardly/core';
+import { traverse } from '@bakes/dastardly-core';
 
 traverse(ast, (node) => {
   console.log(node.type, node.loc);
@@ -262,7 +262,7 @@ traverse(ast, (node) => {
 Find all nodes matching a predicate:
 
 ```typescript
-import { findAll, isStringNode } from '@dastardly/core';
+import { findAll, isStringNode } from '@bakes/dastardly-core';
 
 const stringNodes = findAll(ast, isStringNode);
 ```
@@ -272,7 +272,7 @@ const stringNodes = findAll(ast, isStringNode);
 Find the first node matching a predicate:
 
 ```typescript
-import { findFirst, isNumberNode } from '@dastardly/core';
+import { findFirst, isNumberNode } from '@bakes/dastardly-core';
 
 const firstNumber = findFirst(ast, isNumberNode);
 ```
@@ -282,7 +282,7 @@ const firstNumber = findFirst(ast, isNumberNode);
 Get direct children of a node:
 
 ```typescript
-import { getChildren } from '@dastardly/core';
+import { getChildren } from '@bakes/dastardly-core';
 
 const children = getChildren(objectNode);
 // Returns array of PropertyNodes
@@ -295,7 +295,7 @@ const children = getChildren(objectNode);
 Convert AST to native JavaScript values:
 
 ```typescript
-import { toNative } from '@dastardly/core';
+import { toNative } from '@bakes/dastardly-core';
 
 const obj = objectNode([
   propertyNode(
@@ -381,7 +381,7 @@ import {
   booleanNode,
   position,
   sourceLocation,
-} from '@dastardly/core';
+} from '@bakes/dastardly-core';
 
 const loc = sourceLocation(
   position(1, 0, 0),
@@ -415,7 +415,7 @@ const ast = documentNode(
 ### Traversing and Transforming
 
 ```typescript
-import { visit, isStringNode } from '@dastardly/core';
+import { visit, isStringNode } from '@bakes/dastardly-core';
 
 // Collect all string values
 const strings: string[] = [];
@@ -437,7 +437,7 @@ const usersWithAge = findAll(ast, (node) => {
 ### Converting to Native Values
 
 ```typescript
-import { toNative, parseValue } from '@dastardly/json';
+import { toNative, parseValue } from '@bakes/dastardly-json';
 
 const ast = parseValue('{"name": "Alice", "age": 30}');
 const obj = toNative(ast);
@@ -448,9 +448,9 @@ console.log(obj.age);  // 30
 
 ## Related Packages
 
-- **[@dastardly/json](https://www.npmjs.com/package/@dastardly/json)** - JSON parser and serializer
-- **[@dastardly/tree-sitter-runtime](https://www.npmjs.com/package/@dastardly/tree-sitter-runtime)** - Tree-sitter runtime abstraction
-- **[@dastardly/yaml](https://www.npmjs.com/package/@dastardly/yaml)** - YAML parser and serializer (coming soon)
+- **[@bakes/dastardly-json](https://www.npmjs.com/package/@bakes/dastardly-json)** - JSON parser and serializer
+- **[@bakes/dastardly-tree-sitter-runtime](https://www.npmjs.com/package/@bakes/dastardly-tree-sitter-runtime)** - Tree-sitter runtime abstraction
+- **[@bakes/dastardly-yaml](https://www.npmjs.com/package/@bakes/dastardly-yaml)** - YAML parser and serializer (coming soon)
 
 ## Documentation
 

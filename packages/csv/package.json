@@ -1,5 +1,5 @@
 {
-  "name": "@dastardly/csv",
+  "name": "@bakes/dastardly-csv",
   "version": "0.1.0",
   "description": "CSV parser and serializer for dASTardly",
   "type": "module",
@@ -46,9 +46,9 @@
     "access": "public"
   },
   "dependencies": {
-    "@dastardly/core": "workspace:^",
-    "@dastardly/tree-sitter-csv": "workspace:^",
-    "@dastardly/tree-sitter-runtime": "workspace:^",
+    "@bakes/dastardly-core": "workspace:^",
+    "@bakes/dastardly-tree-sitter-csv": "workspace:^",
+    "@bakes/dastardly-tree-sitter-runtime": "workspace:^",
     "tree-sitter": "^0.21.1"
   },
   "devDependencies": {

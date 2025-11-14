@@ -7,7 +7,7 @@
 
 import { describe, it, expect } from 'vitest';
 import * as testSuite from '@json-schema-org/tests';
-import { json } from '@dastardly/json';
+import { json } from '@bakes/dastardly-json';
 import { Validator } from '../src/validator.js';
 
 // Load Draft 7 tests using the correct API

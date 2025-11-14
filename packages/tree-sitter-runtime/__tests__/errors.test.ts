@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { ParseError } from '../src/index.js';
-import { sourceLocation, position } from '@dastardly/core';
+import { sourceLocation, position } from '@bakes/dastardly-core';
 
 describe('ParseError', () => {
   it('creates an error with message and location', () => {

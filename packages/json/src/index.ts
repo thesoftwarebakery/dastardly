@@ -1,7 +1,7 @@
-// @dastardly/json - JSON parser and serializer
+// @bakes/dastardly-json - JSON parser and serializer
 
-import type { DocumentNode, DataNode, FormatPackage } from '@dastardly/core';
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
+import type { DocumentNode, DataNode, FormatPackage } from '@bakes/dastardly-core';
+import { NodeTreeSitterRuntime } from '@bakes/dastardly-tree-sitter-runtime';
 import JSON_LANGUAGE from 'tree-sitter-json';
 
 // Export public types
@@ -17,7 +17,7 @@ import { serialize as serializeNode, type JSONSerializeOptions } from './seriali
  *
  * @example
  * ```typescript
- * import { json } from '@dastardly/json';
+ * import { json } from '@bakes/dastardly-json';
  *
  * // Parse JSON
  * const ast = json.parse('{"name": "Alice", "age": 30}');

@@ -1,6 +1,6 @@
 # Format Package Implementation Guide
 
-This guide shows how to implement new format packages (YAML, XML, CSV, TOML, etc.) following the patterns established by `@dastardly/json`.
+This guide shows how to implement new format packages (YAML, XML, CSV, TOML, etc.) following the patterns established by `@bakes/dastardly-json`.
 
 ## Overview
 
@@ -28,7 +28,7 @@ packages/format-name/
 ### package.json
 ```json
 {
-  "name": "@dastardly/format-name",
+  "name": "@bakes/dastardly-format-name",
   "version": "0.1.0",
   "description": "FORMAT parser and serializer for dASTardly",
   "type": "module",
@@ -41,8 +41,8 @@ packages/format-name/
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@dastardly/core": "workspace:^",
-    "@dastardly/tree-sitter-runtime": "workspace:^",
+    "@bakes/dastardly-core": "workspace:^",
+    "@bakes/dastardly-tree-sitter-runtime": "workspace:^",
     "tree-sitter": "^0.21.1",
     "tree-sitter-format-name": "^x.x.x"  // Find appropriate version
   },
@@ -123,8 +123,8 @@ Create `FormatParser` class extending `TreeSitterParser`.
 
 ### Template
 ```typescript
-import type { DocumentNode, DataNode } from '@dastardly/core';
-import { documentNode, objectNode, arrayNode, /* ... */ } from '@dastardly/core';
+import type { DocumentNode, DataNode } from '@bakes/dastardly-core';
+import { documentNode, objectNode, arrayNode, /* ... */ } from '@bakes/dastardly-core';
 import {
   TreeSitterParser,
   type ParserRuntime,
@@ -132,7 +132,7 @@ import {
   type SyntaxNode,
   nodeToLocation,
   ParseError,
-} from '@dastardly/tree-sitter-runtime';
+} from '@bakes/dastardly-tree-sitter-runtime';
 import { unescapeString } from './utils.js';
 
 export class FormatParser extends TreeSitterParser {
@@ -210,7 +210,7 @@ Create `serialize()` function that converts AST back to format.
 
 ### Template
 ```typescript
-import type { DocumentNode, DataNode } from '@dastardly/core';
+import type { DocumentNode, DataNode } from '@bakes/dastardly-core';
 import { escapeString, normalizeIndent } from './utils.js';
 
 export interface SerializeOptions {
@@ -249,7 +249,7 @@ function serializeValue(
 }
 
 function serializeObject(
-  node: import('@dastardly/core').ObjectNode,
+  node: import('@bakes/dastardly-core').ObjectNode,
   depth: number,
   indent: string,
   preserveRaw: boolean
@@ -294,8 +294,8 @@ Create `index.ts` to export public API.
 
 ### Template
 ```typescript
-import type { DocumentNode, DataNode } from '@dastardly/core';
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
+import type { DocumentNode, DataNode } from '@bakes/dastardly-core';
+import { NodeTreeSitterRuntime } from '@bakes/dastardly-tree-sitter-runtime';
 import FORMAT_LANGUAGE from 'tree-sitter-format-name';
 
 // Re-export main classes and types
@@ -375,7 +375,7 @@ Create comprehensive tests following the JSON package pattern.
 
 ### Test Helpers
 ```typescript
-import { sourceLocation, position } from '@dastardly/core';
+import { sourceLocation, position } from '@bakes/dastardly-core';
 
 // Create dummy location for AST node construction
 const loc = sourceLocation(position(1, 0, 0), position(1, 1, 1), 'format');
@@ -461,21 +461,21 @@ After creating the package README:
 Use the following template as a starting point:
 
 ```markdown
-# @dastardly/format-name
+# @bakes/dastardly-format-name
 
 FORMAT parser and serializer for dASTardly.
 
 ## Installation
 
 \`\`\`bash
-pnpm add @dastardly/format-name
+pnpm add @bakes/dastardly-format-name
 \`\`\`
 
 ## Usage
 
 ### Parsing
 \`\`\`typescript
-import { parse, parseValue } from '@dastardly/format-name';
+import { parse, parseValue } from '@bakes/dastardly-format-name';
 
 const doc = parse('format source here');
 console.log(doc.body); // Access AST
@@ -483,7 +483,7 @@ console.log(doc.body); // Access AST
 
 ### Serializing
 \`\`\`typescript
-import { stringify } from '@dastardly/format-name';
+import { stringify } from '@bakes/dastardly-format-name';
 
 const json = stringify(astNode);
 const pretty = stringify(astNode, 2); // Pretty-print with 2 spaces
@@ -491,8 +491,8 @@ const pretty = stringify(astNode, 2); // Pretty-print with 2 spaces
 
 ### Advanced
 \`\`\`typescript
-import { FormatParser, serialize } from '@dastardly/format-name';
-import { NodeTreeSitterRuntime } from '@dastardly/tree-sitter-runtime';
+import { FormatParser, serialize } from '@bakes/dastardly-format-name';
+import { NodeTreeSitterRuntime } from '@bakes/dastardly-tree-sitter-runtime';
 import FORMAT_LANGUAGE from 'tree-sitter-format-name';
 
 // Reusable parser instance

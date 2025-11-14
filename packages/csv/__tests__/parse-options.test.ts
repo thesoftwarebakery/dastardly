@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parse } from '../src/index.js';
-import { isArrayNode, isObjectNode, isNumberNode, isBooleanNode } from '@dastardly/core';
+import { isArrayNode, isObjectNode, isNumberNode, isBooleanNode } from '@bakes/dastardly-core';
 
 describe('CSV parse() with options', () => {
   describe('inferTypes option', () => {

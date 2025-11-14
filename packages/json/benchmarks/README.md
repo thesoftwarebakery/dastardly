@@ -1,6 +1,6 @@
 # JSON Parser & Serializer Benchmarks
 
-Comprehensive performance benchmarking of `@dastardly/json` against native `JSON.parse` and `JSON.stringify`.
+Comprehensive performance benchmarking of `@bakes/dastardly-json` against native `JSON.parse` and `JSON.stringify`.
 
 ## Running Benchmarks
 

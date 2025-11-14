@@ -11,7 +11,7 @@ import type {
   BooleanNode,
   NullNode,
   BaseSerializeOptions,
-} from '@dastardly/core';
+} from '@bakes/dastardly-core';
 import {
   escapeDoubleQuoteString,
   isPlainSafe,

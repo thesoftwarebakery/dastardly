@@ -8,7 +8,7 @@ Create a new package in the dastardly monorepo. Ask the user for:
 
 Then:
 1. Create the package structure in `packages/<name>/`
-2. Set up package.json with correct naming (@dastardly/<name>)
+2. Set up package.json with correct naming (@bakes/dastardly-<name>)
 3. Create src/ directory with index.ts
 4. Create tsconfig.json extending the root config
-5. Add appropriate dependencies (tree-sitter, @dastardly/core)
+5. Add appropriate dependencies (tree-sitter, @bakes/dastardly-core)

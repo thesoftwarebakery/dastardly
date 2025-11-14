@@ -1,6 +1,6 @@
 # CSV Parser & Serializer Benchmarks
 
-Comprehensive performance benchmarking of `@dastardly/csv` against `csv-parse` and `csv-stringify`.
+Comprehensive performance benchmarking of `@bakes/dastardly-csv` against `csv-parse` and `csv-stringify`.
 
 ## Running Benchmarks
 

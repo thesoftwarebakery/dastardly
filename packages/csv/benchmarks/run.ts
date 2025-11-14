@@ -1,7 +1,7 @@
 /**
  * CSV Parser & Serializer Benchmarks
  *
- * Compares @dastardly/csv against csv-parse/csv-stringify
+ * Compares @bakes/dastardly-csv against csv-parse/csv-stringify
  *
  * Run with: npx tsx benchmarks/run.ts
  */
@@ -9,7 +9,7 @@
 import Benchmark from 'benchmark';
 import { csv } from '../src/index.js';
 import { fixtures, printFixtureSummary, type Fixture } from './fixtures.js';
-import type { DocumentNode } from '@dastardly/core';
+import type { DocumentNode } from '@bakes/dastardly-core';
 import { parse as csvParse } from 'csv-parse/sync';
 import { stringify as csvStringify } from 'csv-stringify/sync';
 
@@ -213,7 +213,7 @@ async function main(): Promise<void> {
   console.log('║                                                               ║');
   console.log('║           CSV Parser & Serializer Benchmarks                  ║');
   console.log('║                                                               ║');
-  console.log('║      Comparing @dastardly/csv vs csv-parse/csv-stringify      ║');
+  console.log('║      Comparing @bakes/dastardly-csv vs csv-parse/csv-stringify      ║');
   console.log('║                                                               ║');
   console.log('╚═══════════════════════════════════════════════════════════════╝');
   console.log(colors.reset);

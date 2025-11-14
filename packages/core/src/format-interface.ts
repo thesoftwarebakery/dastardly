@@ -41,7 +41,7 @@ export interface BaseSerializeOptions {
  * @example
  * ```typescript
  * // Implementing a format package with parse options
- * import type { FormatPackage } from '@dastardly/core';
+ * import type { FormatPackage } from '@bakes/dastardly-core';
  *
  * export interface CSVSerializeOptions extends BaseSerializeOptions {
  *   delimiter?: string;
@@ -79,7 +79,7 @@ export interface FormatPackage<
    *
    * @example
    * ```typescript
-   * import { csv } from '@dastardly/csv';
+   * import { csv } from '@bakes/dastardly-csv';
    *
    * // Parse with default options
    * const ast1 = csv.parse('name,age\nAlice,30');
@@ -104,8 +104,8 @@ export interface FormatPackage<
    *
    * @example
    * ```typescript
-   * import { json } from '@dastardly/json';
-   * import { objectNode, propertyNode, stringNode, numberNode } from '@dastardly/core';
+   * import { json } from '@bakes/dastardly-json';
+   * import { objectNode, propertyNode, stringNode, numberNode } from '@bakes/dastardly-core';
    *
    * const ast = objectNode([
    *   propertyNode(stringNode('name'), stringNode('Alice')),

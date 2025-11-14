@@ -1,6 +1,6 @@
 // JSON serializer implementation
 
-import type { DocumentNode, DataNode, BaseSerializeOptions } from '@dastardly/core';
+import type { DocumentNode, DataNode, BaseSerializeOptions } from '@bakes/dastardly-core';
 import { escapeString, normalizeIndent } from './utils.js';
 
 /**
@@ -66,7 +66,7 @@ function serializeValue(
 }
 
 function serializeObject(
-  node: import('@dastardly/core').ObjectNode,
+  node: import('@bakes/dastardly-core').ObjectNode,
   depth: number,
   indent: string,
   preserveRaw: boolean
@@ -97,7 +97,7 @@ function serializeObject(
 }
 
 function serializeArray(
-  node: import('@dastardly/core').ArrayNode,
+  node: import('@bakes/dastardly-core').ArrayNode,
   depth: number,
   indent: string,
   preserveRaw: boolean
@@ -125,7 +125,7 @@ function serializeArray(
 }
 
 function serializeString(
-  node: import('@dastardly/core').StringNode,
+  node: import('@bakes/dastardly-core').StringNode,
   preserveRaw: boolean
 ): string {
   if (preserveRaw && node.raw) {
@@ -135,7 +135,7 @@ function serializeString(
 }
 
 function serializeNumber(
-  node: import('@dastardly/core').NumberNode,
+  node: import('@bakes/dastardly-core').NumberNode,
   preserveRaw: boolean
 ): string {
   if (preserveRaw && node.raw) {

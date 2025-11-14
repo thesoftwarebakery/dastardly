@@ -1,4 +1,4 @@
-# @dastardly/integration-tests
+# @bakes/dastardly-integration-tests
 
 Integration tests for the dASTardly project, validating cross-format conversions, position tracking, and real-world usage scenarios.
 
@@ -95,9 +95,9 @@ Integration tests should:
 Example:
 
 ```typescript
-import { parse as parseJSON, stringify as stringifyJSON } from '@dastardly/json';
-import { parse as parseYAML, serialize as serializeYAML } from '@dastardly/yaml';
-import { toNative } from '@dastardly/core';
+import { parse as parseJSON, stringify as stringifyJSON } from '@bakes/dastardly-json';
+import { parse as parseYAML, serialize as serializeYAML } from '@bakes/dastardly-yaml';
+import { toNative } from '@bakes/dastardly-core';
 
 it('converts JSON to YAML and back', () => {
   const jsonSource = '{"name": "Alice", "age": 30}';

@@ -16,7 +16,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { parse } from '../src/index.js';
-import { isArrayNode, isObjectNode, isStringNode } from '@dastardly/core';
+import { isArrayNode, isObjectNode, isStringNode } from '@bakes/dastardly-core';
 import { fixtures } from '../benchmarks/fixtures.js';
 
 describe('RFC 4180: Spaces in Unquoted Fields', () => {

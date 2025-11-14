@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parseCSV } from '../src/parser.js';
-import { isArrayNode, isObjectNode } from '@dastardly/core';
+import { isArrayNode, isObjectNode } from '@bakes/dastardly-core';
 
 describe('CSV Edge Cases (from integration tests)', () => {
   describe('Trailing empty fields', () => {
