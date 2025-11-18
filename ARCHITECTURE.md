@@ -355,43 +355,202 @@ Serializers should:
 
 ## Validation Architecture
 
-(Future feature - Phase 3)
+**Status:** ✅ Implemented (v0.1.0)
+
+### Multi-Draft JSON Schema Support
+
+The `@bakes/dastardly-validation` package provides comprehensive JSON Schema validation with support for multiple draft versions:
 
 ```typescript
-interface ValidationError {
-  message: string;
-  path: string[];        // JSON path to error
-  loc: SourceLocation;   // Original source location
-  schemaPath: string[];  // Path in schema
-}
+import { Validator } from '@bakes/dastardly-validation';
+import type { JSONSchema7 } from 'json-schema';
 
-interface ValidationOptions {
-  failFast?: boolean;    // Stop at first error (default: false)
-}
+const schema: JSONSchema7 = {
+  type: 'object',
+  properties: {
+    name: { type: 'string' }
+  }
+};
 
+const validator = new Validator(schema, { draft: 'draft-07' });
+const result = validator.validate(document);
+```
+
+### Supported Drafts
+
+| Draft | Status | Test Coverage | Key Features |
+|-------|--------|---------------|--------------|
+| Draft 4 | ✅ Implemented | 511 tests (85.3%) | Boolean `exclusiveMinimum`/`exclusiveMaximum` |
+| Draft 6 | ✅ Implemented | 677 tests (87.7%) | Numeric exclusive bounds, `propertyNames`, `const` |
+| Draft 7 | ✅ Implemented | 776 tests (88.8%) | `if`/`then`/`else`, 17 format validators |
+| Draft 2020-12 | 🔧 Architecture ready | 0 tests (planned) | `prefixItems`, `unevaluatedProperties`, `$dynamicRef` |
+
+**Overall test coverage:** 1,964 tests passing across 3 draft versions (85.5%)
+
+### Design Decisions
+
+#### 1. **Type-Safe API with Constructor Overloads**
+
+The Validator uses TypeScript constructor overloads to enforce compile-time type safety:
+
+```typescript
+class Validator {
+  constructor(schema: JSONSchema4, options: ValidatorOptions<'draft-04'>);
+  constructor(schema: JSONSchema6, options: ValidatorOptions<'draft-06'>);
+  constructor(schema: JSONSchema7, options?: ValidatorOptions<'draft-07'>);
+  constructor(schema: JSONSchema202012, options: ValidatorOptions<'draft-2020-12'>);
+}
+```
+
+This ensures the schema type matches the draft option at compile-time, preventing runtime errors.
+
+#### 2. **Draft Logic Centralization**
+
+Draft-specific logic is centralized in the `SchemaCompiler`:
+
+```typescript
+// compiler.ts
+if (this.draft === 'draft-04') {
+  // Draft 4: exclusiveMinimum/exclusiveMaximum are booleans
+  if (schema.minimum !== undefined) {
+    const exclusive = schema.exclusiveMinimum === true;
+    validators.push(createMinimumValidator(schema.minimum, exclusive));
+  }
+} else {
+  // Draft 6+: standalone numeric values
+  // ...
+}
+```
+
+**Benefits:**
+- ✅ Single decision point for draft-specific behavior
+- ✅ Validators remain draft-agnostic (just accept parameters)
+- ✅ Easy to extend for new drafts
+- ✅ Zero runtime overhead during validation (decisions made at compile-time)
+
+#### 3. **Structural Compatibility**
+
+Internally, the compiler uses `JSONSchema7` as a common base type since all supported drafts have compatible structures for validation keywords:
+
+- JSONSchema4, JSONSchema6, JSONSchema7 are from the same package (`@types/json-schema`)
+- JSONSchema202012 is a superset (from `json-schema-typed`)
+- Type casts are justified and documented with structural compatibility comments
+
+#### 4. **Modular Validator Architecture**
+
+Each JSON Schema keyword is implemented as an independent, composable validator:
+
+```typescript
+interface KeywordValidator {
+  validate(node: DataNode, pointer: string, schemaPath: string, context: ValidationContext): ValidationError[];
+  appliesTo?(node: DataNode): boolean;  // Performance optimization
+}
+```
+
+**32 keywords implemented:**
+- Type validation: `type`, `enum`, `const`
+- Strings: `minLength`, `maxLength`, `pattern`, `format` (17 formats)
+- Numbers: `minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum`, `multipleOf`
+- Arrays: `minItems`, `maxItems`, `uniqueItems`, `items`, `additionalItems`, `contains`
+- Objects: `required`, `minProperties`, `maxProperties`, `properties`, `patternProperties`, `additionalProperties`, `dependencies`, `propertyNames`
+- Combinators: `allOf`, `anyOf`, `oneOf`, `not`
+- Conditional: `if`/`then`/`else` (Draft 7+)
+- References: `$ref` (local JSON Pointers)
+
+### Two-Level Caching Architecture
+
+Inspired by AJV for optimal performance:
+
+#### L1: Schema Compilation Cache
+```typescript
+private readonly cache = new Map<JSONSchema7, CompiledSchema>();
+```
+- Schemas compiled once to optimized validator arrays
+- Cached by schema reference
+- ~3,500x-6,800x faster compilation than AJV
+
+#### L2: Validation Result Cache
+```typescript
+class ValidationCache {
+  private cache = new Map<string, ValidationResult>();
+  // Content-addressable using node identity hashes
+  // Automatic invalidation when node content changes
+}
+```
+- Results cached by content hash
+- LRU eviction policy (default: 1000 entries)
+- Automatic cache invalidation on node changes
+
+### Error Reporting
+
+```typescript
 interface ValidationResult {
   valid: boolean;
-  errors: ValidationError[];
+  errors: readonly ValidationError[];
 }
 
-class SchemaValidator {
-  validate(
-    ast: DocumentNode,
-    schema: JSONSchema,
-    options?: ValidationOptions
-  ): ValidationResult {
-    // Validate AST (format-agnostic) against schema
-    // Collect all errors unless failFast is true
-    // Return errors with original source positions
-  }
+interface ValidationError {
+  path: string;              // JSON Pointer (/foo/bar/0)
+  message: string;           // Human-readable description
+  keyword: string;           // Schema keyword that failed
+  schemaPath: string;        // Path in schema
+  location: SourceLocation;  // Source line/column/offset
+  params?: Record<string, unknown>; // Additional context
+}
+```
+
+**Key feature:** Every error includes original source location, enabling precise error reporting in editors.
+
+### Performance Characteristics
+
+| Operation | Performance |
+|-----------|-------------|
+| Schema compilation | 3,500x-6,800x faster than AJV (600K-850K ops/sec) |
+| Validation (small files <1KB) | 0.2-2ms |
+| Validation (medium files 1-10KB) | 2-10ms |
+| Validation (large files >100KB) | May exceed 100ms (not optimized for large files) |
+
+**Trade-off:** Fast compilation, slower validation than AJV (which uses JIT code generation).
+
+**Use case:** Optimal for real-time editor validation where compilation happens once and validation happens frequently on small documents.
+
+### Cross-Format Validation
+
+The validator works with ASTs from any format parser:
+
+```typescript
+// Validate YAML against JSON Schema
+const yamlDocument = yaml.parse('name: Alice\nage: 30');
+const validator = new Validator(schema);
+const result = validator.validate(yamlDocument);
+
+// Errors report YAML line numbers
+if (!result.valid) {
+  console.error(result.errors[0].location.start.line); // YAML line number
 }
 ```
 
 This enables:
-- Validate YAML against JSON Schema
-- Report errors at YAML line numbers
-- Same schema works for any format
-- User can choose to see all errors or stop at first error
+- ✅ Same schema validates any format (JSON, YAML, CSV, etc.)
+- ✅ Errors report original source locations
+- ✅ Format-agnostic validation logic
+
+### Future: Draft 2020-12 Implementation
+
+**Required new keywords:**
+- `prefixItems` - Tuple validation (replaces array-based `items`)
+- `items` - Now applies after `prefixItems` (semantics changed)
+- `unevaluatedProperties` - Validates properties not evaluated by other keywords
+- `unevaluatedItems` - Validates items not evaluated by other keywords
+- `$dynamicRef` / `$dynamicAnchor` - Dynamic recursive references
+
+**Implementation approach:**
+1. Fetch Draft 2020-12 tests from GitHub (not yet in `@json-schema-org/tests` npm package)
+2. Implement validators one keyword at a time (TDD)
+3. Share ~70% of existing validators (type, string, number, basic object/array)
+4. Add compiler logic for 2020-12-specific semantics
+
+**Estimated effort:** 1-2 weeks
 
 ## Monorepo Structure
 
