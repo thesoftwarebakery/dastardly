@@ -1,8 +1,9 @@
 /**
- * Official JSON Schema Test Suite
+ * Official JSON Schema Test Suite - Draft 7
  * https://github.com/json-schema-org/JSON-Schema-Test-Suite
  *
- * This runs the official test suite to ensure full JSON Schema Draft 7 compliance
+ * This runs the official Draft 7 test suite to ensure full JSON Schema Draft 7 compliance.
+ * For other draft versions, see json-schema-draft-*.test.ts files.
  */
 
 import { describe, it, expect } from 'vitest';

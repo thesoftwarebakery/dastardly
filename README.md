@@ -7,7 +7,7 @@ A high-performance data format parser and serializer that uses a common AST (Abs
 - ✅ **JSON** - Full support with position tracking
 - ✅ **YAML** - Anchors, aliases, tags, merge keys, block scalars
 - ✅ **CSV/TSV/PSV** - RFC 4180 compliant with external scanner
-- ✅ **Validation** - JSON Schema Draft 7 support
+- ✅ **Validation** - JSON Schema multi-draft support (Drafts 4, 6, 7)
 
 ## Features
 

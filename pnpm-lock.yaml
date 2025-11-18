@@ -220,8 +220,8 @@ importers:
         specifier: workspace:^
         version: link:../json
       '@json-schema-org/tests':
-        specifier: ^1.0.0
-        version: 1.0.0
+        specifier: ^2.0.0
+        version: 2.0.0
       '@types/benchmark':
         specifier: ^2.1.5
         version: 2.1.5
@@ -237,6 +237,9 @@ importers:
       benchmark:
         specifier: ^2.1.4
         version: 2.1.4
+      json-schema-typed:
+        specifier: ^8.0.2
+        version: 8.0.2
       typescript:
         specifier: ^5.3.0
         version: 5.9.3
@@ -471,8 +474,8 @@ packages:
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
 
-  '@json-schema-org/tests@1.0.0':
-    resolution: {integrity: sha512-MfUcZ7IgD4YBsUpvl16Bvn1DWEW4vlr5Y1at1j+ZDlRSx1/mGYDpY4ZDyhyu+dZZoVOg+GOsdDacIS63oujuEA==}
+  '@json-schema-org/tests@2.0.0':
+    resolution: {integrity: sha512-plJrcsV6SqgxI+K0L93m21hyTjGdssoT6Cj3vqAifEJ0jAsP5Pi/HBFrtUb+PTDwjdaxIWkH8UdN2CJCGUIsgg==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -1559,8 +1562,8 @@ packages:
   json-pointer@0.6.2:
     resolution: {integrity: sha512-vLWcKbOaXlO+jvRy4qNd+TI1QUPZzfJj1tpJ3vAXDych5XJf93ftpUKe5pKCrzyIIwgBJcOcCVRUfqQP25afBw==}
 
-  json-schema-test-suite@https://codeload.github.com/json-schema-org/JSON-Schema-Test-Suite/tar.gz/8982b0b:
-    resolution: {tarball: https://codeload.github.com/json-schema-org/JSON-Schema-Test-Suite/tar.gz/8982b0b}
+  json-schema-test-suite@https://codeload.github.com/json-schema-org/JSON-Schema-Test-Suite/tar.gz/0a0f0cd:
+    resolution: {tarball: https://codeload.github.com/json-schema-org/JSON-Schema-Test-Suite/tar.gz/0a0f0cd}
     version: 0.1.0
 
   json-schema-traverse@0.4.1:
@@ -1568,6 +1571,9 @@ packages:
 
   json-schema-traverse@1.0.0:
     resolution: {integrity: sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==}
+
+  json-schema-typed@8.0.2:
+    resolution: {integrity: sha512-fQhoXdcvc3V28x7C7BMs4P5+kNlgUURe2jmUT1T//oBRMDrqy1QPelJimwZGo7Hg9VPV3EQV5Bnq4hbFy2vetA==}
 
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
@@ -2762,9 +2768,9 @@ snapshots:
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
-  '@json-schema-org/tests@1.0.0':
+  '@json-schema-org/tests@2.0.0':
     dependencies:
-      json-schema-test-suite: https://codeload.github.com/json-schema-org/JSON-Schema-Test-Suite/tar.gz/8982b0b
+      json-schema-test-suite: https://codeload.github.com/json-schema-org/JSON-Schema-Test-Suite/tar.gz/0a0f0cd
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
@@ -3918,11 +3924,13 @@ snapshots:
     dependencies:
       foreach: 2.0.6
 
-  json-schema-test-suite@https://codeload.github.com/json-schema-org/JSON-Schema-Test-Suite/tar.gz/8982b0b: {}
+  json-schema-test-suite@https://codeload.github.com/json-schema-org/JSON-Schema-Test-Suite/tar.gz/0a0f0cd: {}
 
   json-schema-traverse@0.4.1: {}
 
   json-schema-traverse@1.0.0: {}
+
+  json-schema-typed@8.0.2: {}
 
   json-stable-stringify-without-jsonify@1.0.1: {}
 

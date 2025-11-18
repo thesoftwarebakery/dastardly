@@ -2,6 +2,7 @@
 
 import type { JSONSchema7 } from 'json-schema';
 import type { CompiledSchema, KeywordValidator } from './compiler-types.js';
+import type { Draft, AnyJSONSchema } from './draft.js';
 import { createTypeValidator } from './validators/type.js';
 import {
   createMinLengthValidator,
@@ -52,8 +53,21 @@ import { createFormatValidator } from './validators/format.js';
  * Maintains a cache of compiled schemas by reference for performance
  */
 export class SchemaCompiler {
+  // Note: We use JSONSchema7 internally as it's compatible with all draft types
+  // for the common validation keywords we support. The public API (Validator constructor)
+  // enforces type safety via overloads.
   private readonly cache = new Map<JSONSchema7, CompiledSchema>();
   private rootSchema: JSONSchema7 | null = null;
+  private readonly draft: Draft;
+
+  /**
+   * Create a new schema compiler
+   *
+   * @param draft - JSON Schema draft version to compile for
+   */
+  constructor(draft: Draft) {
+    this.draft = draft;
+  }
 
   /**
    * Compile a JSON schema to optimized validators
@@ -62,10 +76,11 @@ export class SchemaCompiler {
    * @param isRoot - Whether this is the root schema (for $ref resolution)
    * @returns Compiled schema with validators
    */
-  compile(schema: JSONSchema7 | boolean, isRoot = false): CompiledSchema {
+  compile(schema: AnyJSONSchema | boolean, isRoot = false): CompiledSchema {
     // Store root schema for $ref resolution
+    // Cast is safe: all supported schema types have compatible structures for validation keywords
     if (isRoot && typeof schema === 'object') {
-      this.rootSchema = schema;
+      this.rootSchema = schema as JSONSchema7;
     }
 
     // Handle boolean schemas
@@ -77,22 +92,26 @@ export class SchemaCompiler {
     }
 
     // Check cache first (by schema reference)
-    const cached = this.cache.get(schema);
+    // Cast is safe: all supported schema types are structurally compatible
+    const cached = this.cache.get(schema as JSONSchema7);
     if (cached) {
       return cached;
     }
 
     // Compile schema
-    const compiled = this.compileSchema(schema);
+    const compiled = this.compileSchema(schema as JSONSchema7);
 
     // Cache result
-    this.cache.set(schema, compiled);
+    this.cache.set(schema as JSONSchema7, compiled);
 
     return compiled;
   }
 
   /**
    * Compile schema to validators
+   *
+   * Note: Uses JSONSchema7 type internally as all supported drafts have compatible
+   * structures for the validation keywords we support.
    */
   private compileSchema(schema: JSONSchema7): CompiledSchema {
     const validators: KeywordValidator[] = [];
@@ -139,17 +158,32 @@ export class SchemaCompiler {
     }
 
     // Number validators
-    if (schema.minimum !== undefined) {
-      validators.push(createMinimumValidator(schema.minimum));
-    }
-    if (schema.maximum !== undefined) {
-      validators.push(createMaximumValidator(schema.maximum));
-    }
-    if (schema.exclusiveMinimum !== undefined) {
-      validators.push(createExclusiveMinimumValidator(schema.exclusiveMinimum));
-    }
-    if (schema.exclusiveMaximum !== undefined) {
-      validators.push(createExclusiveMaximumValidator(schema.exclusiveMaximum));
+    // Draft 4 uses boolean exclusiveMinimum/exclusiveMaximum
+    // Draft 6+ uses numeric exclusiveMinimum/exclusiveMaximum
+    if (this.draft === 'draft-04') {
+      // Draft 4: exclusiveMinimum/exclusiveMaximum are booleans that modify minimum/maximum
+      if (schema.minimum !== undefined) {
+        const exclusive = typeof schema.exclusiveMinimum === 'boolean' && schema.exclusiveMinimum;
+        validators.push(createMinimumValidator(schema.minimum, exclusive));
+      }
+      if (schema.maximum !== undefined) {
+        const exclusive = typeof schema.exclusiveMaximum === 'boolean' && schema.exclusiveMaximum;
+        validators.push(createMaximumValidator(schema.maximum, exclusive));
+      }
+    } else {
+      // Draft 6+: exclusiveMinimum/exclusiveMaximum are standalone numeric keywords
+      if (schema.minimum !== undefined) {
+        validators.push(createMinimumValidator(schema.minimum));
+      }
+      if (schema.maximum !== undefined) {
+        validators.push(createMaximumValidator(schema.maximum));
+      }
+      if (schema.exclusiveMinimum !== undefined && typeof schema.exclusiveMinimum === 'number') {
+        validators.push(createExclusiveMinimumValidator(schema.exclusiveMinimum));
+      }
+      if (schema.exclusiveMaximum !== undefined && typeof schema.exclusiveMaximum === 'number') {
+        validators.push(createExclusiveMaximumValidator(schema.exclusiveMaximum));
+      }
     }
     if (schema.multipleOf !== undefined) {
       validators.push(createMultipleOfValidator(schema.multipleOf));
