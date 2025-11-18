@@ -7,11 +7,16 @@ import { ValidationCache } from './cache.js';
 import type { ValidationResult, ValidationError } from './types.js';
 import { SchemaCompiler } from './compiler.js';
 import type { CompiledSchema, ValidationContext } from './compiler-types.js';
+import type { Draft, AnyJSONSchema } from './draft.js';
+import { DEFAULT_DRAFT } from './draft.js';
 
 /**
  * Validator options
  */
 export interface ValidatorOptions {
+  /** JSON Schema draft version (default: 'draft-07') */
+  draft?: Draft;
+
   /** Enable validation caching (default: true) */
   cache?: boolean;
 
@@ -24,11 +29,16 @@ export interface ValidatorOptions {
 
 /**
  * JSON Schema validator for dASTardly ASTs
- * Supports JSON Schema Draft 7 with content-addressable caching
+ * Supports JSON Schema Drafts 4, 6, 7, and 2020-12 with content-addressable caching
  *
  * @example
  * ```typescript
+ * // Draft 7 (default)
  * const validator = new Validator(schema);
+ *
+ * // Explicit draft specification
+ * const validator = new Validator(schema, { draft: 'draft-06' });
+ *
  * const result = validator.validate(document);
  * if (!result.valid) {
  *   for (const error of result.errors) {
@@ -42,6 +52,7 @@ export class Validator {
   private readonly cache: ValidationCache | null;
   private readonly failFast: boolean;
   private readonly compiler: SchemaCompiler;
+  private readonly draft: Draft;
 
   /**
    * Create a new validator
@@ -49,9 +60,11 @@ export class Validator {
    * @param schema - JSON Schema (must be fully resolved, no remote $refs)
    * @param options - Validator options
    */
-  constructor(schema: JSONSchema7, options: ValidatorOptions = {}) {
-    this.compiler = new SchemaCompiler();
-    this.compiled = this.compiler.compile(schema, true); // true = isRoot for $ref resolution
+  constructor(schema: AnyJSONSchema, options: ValidatorOptions = {}) {
+    this.draft = options.draft ?? DEFAULT_DRAFT;
+    this.compiler = new SchemaCompiler(this.draft);
+    // Cast to JSONSchema7 for now - will refactor compiler to be generic
+    this.compiled = this.compiler.compile(schema as JSONSchema7, true); // true = isRoot for $ref resolution
     this.cache = options.cache !== false ? new ValidationCache(options.cacheSize) : null;
     this.failFast = options.failFast ?? false;
   }

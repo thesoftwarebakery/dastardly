@@ -2,6 +2,7 @@
 
 import type { JSONSchema7 } from 'json-schema';
 import type { CompiledSchema, KeywordValidator } from './compiler-types.js';
+import type { Draft } from './draft.js';
 import { createTypeValidator } from './validators/type.js';
 import {
   createMinLengthValidator,
@@ -54,6 +55,16 @@ import { createFormatValidator } from './validators/format.js';
 export class SchemaCompiler {
   private readonly cache = new Map<JSONSchema7, CompiledSchema>();
   private rootSchema: JSONSchema7 | null = null;
+  private readonly draft: Draft;
+
+  /**
+   * Create a new schema compiler
+   *
+   * @param draft - JSON Schema draft version to compile for
+   */
+  constructor(draft: Draft) {
+    this.draft = draft;
+  }
 
   /**
    * Compile a JSON schema to optimized validators

@@ -8,6 +8,10 @@ export type {
   ValidationContext,
 } from './compiler-types.js';
 
+// Export draft support
+export type { Draft, AnyJSONSchema, SchemaForDraft } from './draft.js';
+export { DEFAULT_DRAFT, isDraft, detectDraftFromSchemaUri } from './draft.js';
+
 // Export cache
 export { ValidationCache } from './cache.js';
 
