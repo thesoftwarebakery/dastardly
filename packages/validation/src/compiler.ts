@@ -2,7 +2,7 @@
 
 import type { JSONSchema7 } from 'json-schema';
 import type { CompiledSchema, KeywordValidator } from './compiler-types.js';
-import type { Draft } from './draft.js';
+import type { Draft, AnyJSONSchema } from './draft.js';
 import { createTypeValidator } from './validators/type.js';
 import {
   createMinLengthValidator,
@@ -53,6 +53,9 @@ import { createFormatValidator } from './validators/format.js';
  * Maintains a cache of compiled schemas by reference for performance
  */
 export class SchemaCompiler {
+  // Note: We use JSONSchema7 internally as it's compatible with all draft types
+  // for the common validation keywords we support. The public API (Validator constructor)
+  // enforces type safety via overloads.
   private readonly cache = new Map<JSONSchema7, CompiledSchema>();
   private rootSchema: JSONSchema7 | null = null;
   private readonly draft: Draft;
@@ -73,10 +76,11 @@ export class SchemaCompiler {
    * @param isRoot - Whether this is the root schema (for $ref resolution)
    * @returns Compiled schema with validators
    */
-  compile(schema: JSONSchema7 | boolean, isRoot = false): CompiledSchema {
+  compile(schema: AnyJSONSchema | boolean, isRoot = false): CompiledSchema {
     // Store root schema for $ref resolution
+    // Cast is safe: all supported schema types have compatible structures for validation keywords
     if (isRoot && typeof schema === 'object') {
-      this.rootSchema = schema;
+      this.rootSchema = schema as JSONSchema7;
     }
 
     // Handle boolean schemas
@@ -88,22 +92,26 @@ export class SchemaCompiler {
     }
 
     // Check cache first (by schema reference)
-    const cached = this.cache.get(schema);
+    // Cast is safe: all supported schema types are structurally compatible
+    const cached = this.cache.get(schema as JSONSchema7);
     if (cached) {
       return cached;
     }
 
     // Compile schema
-    const compiled = this.compileSchema(schema);
+    const compiled = this.compileSchema(schema as JSONSchema7);
 
     // Cache result
-    this.cache.set(schema, compiled);
+    this.cache.set(schema as JSONSchema7, compiled);
 
     return compiled;
   }
 
   /**
    * Compile schema to validators
+   *
+   * Note: Uses JSONSchema7 type internally as all supported drafts have compatible
+   * structures for the validation keywords we support.
    */
   private compileSchema(schema: JSONSchema7): CompiledSchema {
     const validators: KeywordValidator[] = [];

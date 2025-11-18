@@ -1,21 +1,21 @@
 // JSON Schema validator for dASTardly ASTs
 
-import type { JSONSchema7 } from 'json-schema';
+import type { JSONSchema4, JSONSchema6, JSONSchema7 } from 'json-schema';
 import type { DocumentNode, DataNode, NodeIdentity } from '@bakes/dastardly-core';
 import { computeIdentities } from '@bakes/dastardly-core';
 import { ValidationCache } from './cache.js';
 import type { ValidationResult, ValidationError } from './types.js';
 import { SchemaCompiler } from './compiler.js';
 import type { CompiledSchema, ValidationContext } from './compiler-types.js';
-import type { Draft, AnyJSONSchema } from './draft.js';
+import type { Draft, AnyJSONSchema, JSONSchema202012 } from './draft.js';
 import { DEFAULT_DRAFT } from './draft.js';
 
 /**
  * Validator options
  */
-export interface ValidatorOptions {
+export interface ValidatorOptions<D extends Draft = Draft> {
   /** JSON Schema draft version (default: 'draft-07') */
-  draft?: Draft;
+  draft?: D;
 
   /** Enable validation caching (default: true) */
   cache?: boolean;
@@ -36,7 +36,7 @@ export interface ValidatorOptions {
  * // Draft 7 (default)
  * const validator = new Validator(schema);
  *
- * // Explicit draft specification
+ * // Explicit draft specification with type-safe schema
  * const validator = new Validator(schema, { draft: 'draft-06' });
  *
  * const result = validator.validate(document);
@@ -55,7 +55,27 @@ export class Validator {
   private readonly draft: Draft;
 
   /**
-   * Create a new validator
+   * Create a validator for JSON Schema Draft 4
+   */
+  constructor(schema: JSONSchema4, options: ValidatorOptions<'draft-04'>);
+
+  /**
+   * Create a validator for JSON Schema Draft 6
+   */
+  constructor(schema: JSONSchema6, options: ValidatorOptions<'draft-06'>);
+
+  /**
+   * Create a validator for JSON Schema Draft 7 (default)
+   */
+  constructor(schema: JSONSchema7, options?: ValidatorOptions<'draft-07'>);
+
+  /**
+   * Create a validator for JSON Schema Draft 2020-12
+   */
+  constructor(schema: JSONSchema202012, options: ValidatorOptions<'draft-2020-12'>);
+
+  /**
+   * Create a new validator (implementation)
    *
    * @param schema - JSON Schema (must be fully resolved, no remote $refs)
    * @param options - Validator options
@@ -63,8 +83,7 @@ export class Validator {
   constructor(schema: AnyJSONSchema, options: ValidatorOptions = {}) {
     this.draft = options.draft ?? DEFAULT_DRAFT;
     this.compiler = new SchemaCompiler(this.draft);
-    // Cast to JSONSchema7 for now - will refactor compiler to be generic
-    this.compiled = this.compiler.compile(schema as JSONSchema7, true); // true = isRoot for $ref resolution
+    this.compiled = this.compiler.compile(schema, true); // true = isRoot for $ref resolution
     this.cache = options.cache !== false ? new ValidationCache(options.cacheSize) : null;
     this.failFast = options.failFast ?? false;
   }
