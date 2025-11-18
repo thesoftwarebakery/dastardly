@@ -14,17 +14,20 @@ import { Validator } from '../src/validator.js';
 // Load Draft 4 tests
 const draft4Tests = testSuite.loadSync({ draft: 'draft4' });
 
-// Mark all tests as todo initially - will enable once Draft 4 support is implemented
-const ENABLE_DRAFT_4_TESTS = false;
+// Enable Draft 4 tests to identify what needs implementation
+const ENABLE_DRAFT_4_TESTS = true;
 
-// Test files with known failures
+// Test files with known failures - ONLY mark if also failing in Draft 6/7 or if optional/unfixable
 const knownFailingFiles = new Set([
-  'refRemote.json',     // Remote $ref resolution not implemented
-  'bignum.json',        // Large number parsing issues
+  'refRemote.json',          // Remote $ref resolution not implemented
+  'bignum.json',             // Large number parsing issues
+  'ecmascript-regex.json',   // Advanced regex validation (also fails in Draft 6/7)
+  'zeroTerminatedFloats.json', // Optional test - JavaScript cannot distinguish 1.0 vs 1
 ]);
 
-// Specific test descriptions with known failures
+// Specific test descriptions with known failures - match Draft 6/7
 const knownFailingTests = new Set([
+  // Remote refs and $id-based resolution (not supported - also fails in Draft 6/7)
   'remote ref, containing refs itself',
   'Recursive references between schemas',
   'remote ref',
@@ -34,6 +37,15 @@ const knownFailingTests = new Set([
   'base URI change - change folder',
   'base URI change - change folder in subschema',
   'root ref in remote ref',
+  'valid definition',  // definitions.json - $ref resolution
+  // Location-independent identifier tests use $id resolution (also fails in Draft 6/7)
+  'Location-independent identifier',
+  'Location-independent identifier with absolute URI',
+  'Location-independent identifier with base URI change in subschema',
+  // Regex edge cases (also fail in Draft 6/7)
+  'non-BMP, checks for proper surrogate pair handling for UTF-16',
+  // Format validation edge cases
+  'validation of date-time strings',
 ]);
 
 describe('JSON Schema Test Suite (Draft 4)', () => {
@@ -43,9 +55,8 @@ describe('JSON Schema Test Suite (Draft 4)', () => {
       // Each test file has multiple schemas
       for (const schemaTest of testFile.schemas) {
         describe(schemaTest.description, () => {
-          // Create validator for this schema
-          // Note: Will need to pass draft option once implemented
-          const validator = new Validator(schemaTest.schema);
+          // Create validator for this schema with Draft 4
+          const validator = new Validator(schemaTest.schema, { draft: 'draft-04' });
 
           // Run all validation tests for this schema
           for (const test of schemaTest.tests) {

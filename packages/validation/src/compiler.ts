@@ -150,17 +150,32 @@ export class SchemaCompiler {
     }
 
     // Number validators
-    if (schema.minimum !== undefined) {
-      validators.push(createMinimumValidator(schema.minimum));
-    }
-    if (schema.maximum !== undefined) {
-      validators.push(createMaximumValidator(schema.maximum));
-    }
-    if (schema.exclusiveMinimum !== undefined) {
-      validators.push(createExclusiveMinimumValidator(schema.exclusiveMinimum));
-    }
-    if (schema.exclusiveMaximum !== undefined) {
-      validators.push(createExclusiveMaximumValidator(schema.exclusiveMaximum));
+    // Draft 4 uses boolean exclusiveMinimum/exclusiveMaximum
+    // Draft 6+ uses numeric exclusiveMinimum/exclusiveMaximum
+    if (this.draft === 'draft-04') {
+      // Draft 4: exclusiveMinimum/exclusiveMaximum are booleans that modify minimum/maximum
+      if (schema.minimum !== undefined) {
+        const exclusive = typeof schema.exclusiveMinimum === 'boolean' && schema.exclusiveMinimum;
+        validators.push(createMinimumValidator(schema.minimum, exclusive));
+      }
+      if (schema.maximum !== undefined) {
+        const exclusive = typeof schema.exclusiveMaximum === 'boolean' && schema.exclusiveMaximum;
+        validators.push(createMaximumValidator(schema.maximum, exclusive));
+      }
+    } else {
+      // Draft 6+: exclusiveMinimum/exclusiveMaximum are standalone numeric keywords
+      if (schema.minimum !== undefined) {
+        validators.push(createMinimumValidator(schema.minimum));
+      }
+      if (schema.maximum !== undefined) {
+        validators.push(createMaximumValidator(schema.maximum));
+      }
+      if (schema.exclusiveMinimum !== undefined && typeof schema.exclusiveMinimum === 'number') {
+        validators.push(createExclusiveMinimumValidator(schema.exclusiveMinimum));
+      }
+      if (schema.exclusiveMaximum !== undefined && typeof schema.exclusiveMaximum === 'number') {
+        validators.push(createExclusiveMaximumValidator(schema.exclusiveMaximum));
+      }
     }
     if (schema.multipleOf !== undefined) {
       validators.push(createMultipleOfValidator(schema.multipleOf));

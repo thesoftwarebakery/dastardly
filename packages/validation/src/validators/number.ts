@@ -6,22 +6,27 @@ import type { KeywordValidator } from '../compiler-types.js';
  * Create a minimum validator
  *
  * @param minimum - Minimum numeric value
+ * @param exclusive - Whether the minimum is exclusive (Draft 4 only)
  * @returns Keyword validator for minimum
  */
-export function createMinimumValidator(minimum: number): KeywordValidator {
+export function createMinimumValidator(minimum: number, exclusive = false): KeywordValidator {
   return {
     validate(node, pointer, schemaPath) {
       if (node.type !== 'Number') return [];
 
-      if (node.value < minimum) {
+      const invalid = exclusive ? node.value <= minimum : node.value < minimum;
+
+      if (invalid) {
+        const comparison = exclusive ? 'less than or equal to' : 'less than';
+        const qualifier = exclusive ? 'exclusive ' : '';
         return [
           {
             path: pointer,
-            message: `Value ${node.value} is less than minimum ${minimum}`,
+            message: `Value ${node.value} is ${comparison} ${qualifier}minimum ${minimum}`,
             keyword: 'minimum',
             schemaPath: `${schemaPath}/minimum`,
             location: node.loc,
-            params: { minimum },
+            params: { minimum, exclusiveMinimum: exclusive },
           },
         ];
       }
@@ -37,22 +42,27 @@ export function createMinimumValidator(minimum: number): KeywordValidator {
  * Create a maximum validator
  *
  * @param maximum - Maximum numeric value
+ * @param exclusive - Whether the maximum is exclusive (Draft 4 only)
  * @returns Keyword validator for maximum
  */
-export function createMaximumValidator(maximum: number): KeywordValidator {
+export function createMaximumValidator(maximum: number, exclusive = false): KeywordValidator {
   return {
     validate(node, pointer, schemaPath) {
       if (node.type !== 'Number') return [];
 
-      if (node.value > maximum) {
+      const invalid = exclusive ? node.value >= maximum : node.value > maximum;
+
+      if (invalid) {
+        const comparison = exclusive ? 'greater than or equal to' : 'greater than';
+        const qualifier = exclusive ? 'exclusive ' : '';
         return [
           {
             path: pointer,
-            message: `Value ${node.value} is greater than maximum ${maximum}`,
+            message: `Value ${node.value} is ${comparison} ${qualifier}maximum ${maximum}`,
             keyword: 'maximum',
             schemaPath: `${schemaPath}/maximum`,
             location: node.loc,
-            params: { maximum },
+            params: { maximum, exclusiveMaximum: exclusive },
           },
         ];
       }
