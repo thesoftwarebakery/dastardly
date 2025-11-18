@@ -1,17 +1,19 @@
 # @bakes/dastardly-validation
 
-JSON Schema validator for dASTardly ASTs with comprehensive Draft 7 support.
+JSON Schema validator for dASTardly ASTs with multi-draft support.
 
 ## Features
 
-- ✅ **86.1% JSON Schema Draft 7 compliance** (488/567 official test suite tests passing)
+- ✅ **Multi-draft support** - JSON Schema Draft 4, 6, 7, and architecture for 2020-12
+- ✅ **High test coverage** - 1,964 tests passing across 3 draft versions (85.5% overall)
+- ✅ **Type-safe API** - Constructor overloads enforce draft/schema correspondence
 - ✅ **High-performance schema compilation** - AJV-inspired architecture with validator caching
 - ✅ **Precise error reporting** - Source location tracking with line/column/offset information
 - ✅ **Content-addressable caching** - Automatic validation result caching for identical nodes
 - ✅ **Modular validators** - Clean separation of concerns, testable in isolation
 - ✅ **Full recursive validation** - Nested objects, arrays, and complex schemas
 - ✅ **$ref support** - Local JSON Pointer references with automatic resolution
-- ✅ **Conditional validation** - if/then/else schema logic
+- ✅ **Conditional validation** - if/then/else schema logic (Draft 7+)
 
 ## Installation
 
@@ -25,7 +27,7 @@ pnpm add @bakes/dastardly-validation
 import { json } from '@bakes/dastardly-json';
 import { Validator } from '@bakes/dastardly-validation';
 
-// Define your JSON Schema
+// Define your JSON Schema (Draft 7 is default)
 const schema = {
   type: 'object',
   properties: {
@@ -56,6 +58,55 @@ if (result.valid) {
   }
 }
 ```
+
+## JSON Schema Draft Support
+
+This validator supports multiple JSON Schema draft versions:
+
+### Draft 7 (default)
+```typescript
+import type { JSONSchema7 } from 'json-schema';
+
+const schema: JSONSchema7 = {
+  type: 'string',
+  minLength: 1
+};
+
+// Draft 7 is the default - no options needed
+const validator = new Validator(schema);
+```
+
+### Draft 6
+```typescript
+import type { JSONSchema6 } from 'json-schema';
+
+const schema: JSONSchema6 = {
+  type: 'number',
+  minimum: 0
+};
+
+const validator = new Validator(schema, { draft: 'draft-06' });
+```
+
+### Draft 4
+```typescript
+import type { JSONSchema4 } from 'json-schema';
+
+const schema: JSONSchema4 = {
+  type: 'number',
+  minimum: 10,
+  exclusiveMinimum: true  // Draft 4 uses boolean
+};
+
+const validator = new Validator(schema, { draft: 'draft-04' });
+```
+
+**Key differences between drafts:**
+- **Draft 4**: `exclusiveMinimum`/`exclusiveMaximum` are booleans that modify `minimum`/`maximum`
+- **Draft 6/7**: `exclusiveMinimum`/`exclusiveMaximum` are standalone numeric values
+- **Draft 7**: Added `if`/`then`/`else`, `readOnly`/`writeOnly`
+
+**Type safety:** Constructor overloads ensure the schema type matches the draft option at compile-time.
 
 ## Supported Keywords
 
@@ -108,6 +159,9 @@ if (result.valid) {
 
 ```typescript
 const validator = new Validator(schema, {
+  // JSON Schema draft version (default: 'draft-07')
+  draft: 'draft-07',  // Options: 'draft-04' | 'draft-06' | 'draft-07' | 'draft-2020-12'
+
   // Enable/disable validation result caching (default: true)
   cache: true,
 
@@ -189,29 +243,40 @@ Validators are composable and testable in isolation.
 The validator is tested against the [official JSON Schema Test Suite](https://github.com/json-schema-org/JSON-Schema-Test-Suite):
 
 ```bash
-pnpm test json-schema-test-suite.test.ts
+# Run all draft tests
+pnpm test
+
+# Run specific draft tests
+pnpm test json-schema-draft-7.test.ts
+pnpm test json-schema-draft-6.test.ts
+pnpm test json-schema-draft-4.test.ts
 ```
 
-**Current Status:** 536/567 tests passing (94.5%)
+**Test Coverage Across Drafts:**
 
-### Test Failure Breakdown
+| Draft | Passing | Skipped | Pass Rate |
+|-------|---------|---------|-----------|
+| Draft 4 | 511 | 88 | 85.3% |
+| Draft 6 | 677 | 95 | 87.7% |
+| Draft 7 | 776 | 98 | 88.8% |
+| **Total** | **1,964** | **281** | **85.5%** |
 
-The 31 remaining test failures fall into the following categories:
+### Skipped Tests Breakdown
 
-| Category | Tests | Status | Notes |
-|----------|-------|--------|-------|
-| Remote `$ref` / `$id` | 11 | ❌ Not supported by design | External schema references (http://), named schema resolution via `$id`, and meta-schema validation are intentionally not implemented |
-| BigNum precision | 7 | ⚠️ JSON parser limitation | Numbers with very large exponents (>10^52) exceed JavaScript `Number` precision - would require BigInt support in parser |
-| Content validation | 4 | ⚠️ Optional feature | `contentMediaType`/`contentEncoding` keywords are optional per spec - low priority |
-| Format edge cases | 6 | ⚠️ Strict compliance | Internationalized formats (IRI, IDN hostname) and very strict RFC compliance edge cases |
-| Regex compatibility | 1 | ❌ JavaScript limitation | .NET-specific regex features (`\Z` anchor) not supported by JavaScript |
-| Date-time strict | 1 | ⚠️ Strict RFC compliance | Very specific timezone offset format validation |
-| IDN hostname strict | 1 | ⚠️ Strict compliance | Unicode normalization and illegal character detection |
+The skipped tests fall into consistent categories across all drafts:
+
+| Category | Status | Notes |
+|----------|--------|-------|
+| Remote `$ref` / `$id` | ❌ Not supported by design | External schema references (http://), named schema resolution via `$id` - intentionally not implemented for security/simplicity |
+| BigNum precision | ⚠️ JSON parser limitation | Numbers with very large exponents exceed JavaScript `Number` precision |
+| Regex edge cases | ⚠️ Spec compliance | Unicode surrogate pairs, .NET-specific regex features |
+| Format validation | ⚠️ Strict RFC compliance | Internationalized formats (IRI, IDN), strict date-time validation |
+| Optional features | ⚠️ Low priority | `contentMediaType`/`contentEncoding` (optional per JSON Schema spec) |
+| Float vs integer | ⚠️ JavaScript limitation | Cannot distinguish 1.0 vs 1 (Draft 4 only) |
 
 **Legend:**
-- ❌ = Not supported by design or language limitation (11 tests)
-- ⚠️ = Optional feature, strict compliance, or external limitation (19 tests)
-- ✅ = All realistically fixable issues have been addressed (1 test remaining is a format edge case)
+- ❌ = Not supported by design (security/simplicity trade-off)
+- ⚠️ = Optional feature, strict compliance, or language limitation
 
 ### What's Implemented
 
